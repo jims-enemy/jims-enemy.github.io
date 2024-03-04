@@ -1,13 +1,5 @@
-// Project Title
-// Your Name
-// Date
-//
-// Extra for Experts:
-// - describe what you did to take this project "above and beyond"
-
-
-let columns = 10;
-let rows = 10;
+let columns = 20;
+let rows = 20;
 let currentX;
 let currentY;
 let direction;
@@ -36,7 +28,17 @@ function movePortal() {
 
 function setup() {
   createCanvas(400, 400);
-  while (currentX === appleX && currentY === appleY || direction === 0 && currentX  > width/2 || direction === 2 && currentX < width/2 || direction === 1 && currentY > width/2 || direction === 3 && currentY < width/2 || currentX === portalX1 && currentY === portalY1 || currentX === portalX2 && currentY === portalY2 || appleX === portalX1 && appleY === portalY1 || appleX === portalX2 && appleY === portalY2) {
+  while (
+    (currentX === appleX && currentY === appleY) ||
+    (direction === 0 && currentX > width / 2) ||
+    (direction === 2 && currentX < width / 2) ||
+    (direction === 1 && currentY > width / 2) ||
+    (direction === 3 && currentY < width / 2) ||
+    (currentX === portalX1 && currentY === portalY1) ||
+    (currentX === portalX2 && currentY === portalY2) ||
+    (appleX === portalX1 && appleY === portalY1) ||
+    (appleX === portalX2 && appleY === portalY2)
+  ) {
     currentX = (round(random(columns - 1)) * width) / columns;
     currentY = (round(random(rows - 1)) * height) / rows;
     direction = round(random(3));
@@ -61,9 +63,9 @@ function moveSnake() {
   } else if (direction === 2) {
     currentX -= width / columns;
   } else if (direction === 1) {
-    currentY += height / columns;
+    currentY += height / rows;
   } else {
-    currentY -= height / columns;
+    currentY -= height / rows;
   }
 
   fill("green");
@@ -71,62 +73,128 @@ function moveSnake() {
   rect(currentX, currentY, width / columns, height / rows);
   fill("white");
   for (let bodyPart = 0; bodyPart < snakeCoords.length; bodyPart++) {
-    rect(snakeCoords[bodyPart][0], snakeCoords[bodyPart][1], width / columns, height / rows)
+    rect(
+      snakeCoords[bodyPart][0],
+      snakeCoords[bodyPart][1],
+      width / columns,
+      height / rows
+    );
   }
 }
 
 function apple() {
   noStroke();
   fill("red");
-    while (currentX === appleX && currentY === appleY) {
+  while (
+    (round(currentX) === round(appleX) && round(currentY) === round(appleY)) ||
+    (round(appleX) === round(portalX1) && round(appleY) === round(portalY1)) ||
+    (round(appleX) === round(portalX2) && round(appleY) === round(portalY2))
+  ) {
     moveApple();
     ateApple = true;
     for (let bodyPart = 0; bodyPart < snakeCoords.length; bodyPart++) {
-    if(snakeCoords[bodyPart][0] === appleX && snakeCoords[bodyPart][1] === appleY) {
-      appleX = currentX;
-      appleY = currentY;
+      if (
+        round(snakeCoords[bodyPart][0]) === round(appleX) &&
+        round(snakeCoords[bodyPart][1]) === round(appleY)
+      ) {
+        appleX = currentX;
+        appleY = currentY;
+      }
     }
   }
-  }
- rect(appleX, appleY, width / columns, height / rows);
-
+  rect(appleX, appleY, width / columns, height / rows);
 }
 
 function portal() {
-    noStroke();
-  fill("red");
-    while (currentX === appleX && currentY === appleY) {
-    moveApple();
-    ateApple = true;
-    for (let bodyPart = 0; bodyPart < snakeCoords.length; bodyPart++) {
-    if(snakeCoords[bodyPart][0] === appleX && snakeCoords[bodyPart][1] === appleY) {
-      appleX = currentX;
-      appleY = currentY;
+  noStroke();
+  fill("blue");
+  if (
+    round(currentX) === round(portalX1) &&
+    round(currentY) === round(portalY1)
+  ) {
+    currentX = portalX2;
+    currentY = portalY2;
+    while (
+      (round(currentX) === round(portalX1) &&
+        round(currentY) === round(portalY1)) ||
+      (round(currentX) === round(portalX2) &&
+        round(currentY) === round(portalY2)) ||
+      (round(appleX) === round(portalX1) &&
+        round(appleY) === round(portalY1)) ||
+      (round(appleX) === round(portalX2) && round(appleY) === round(portalY2))
+    ) {
+      movePortal();
+      for (let bodyPart = 0; bodyPart < snakeCoords.length; bodyPart++) {
+        if (
+          (round(snakeCoords[bodyPart][0]) === round(portalX1) &&
+            round(snakeCoords[bodyPart][1]) === round(portalY1)) ||
+          (round(snakeCoords[bodyPart][0]) === round(portalX2) &&
+            round(snakeCoords[bodyPart][1]) === round(portalY2))
+        ) {
+          portalX1 = currentX;
+          portalY1 = currentY;
+        }
+      }
     }
   }
+  if (
+    round(currentX) === round(portalX2) &&
+    round(currentY) === round(portalY2)
+  ) {
+    currentX = portalX1;
+    currentY = portalY1;
+    while (
+      (round(currentX) === round(portalX1) &&
+        round(currentY) === round(portalY1)) ||
+      (round(currentX) === round(portalX2) &&
+        round(currentY) === round(portalY2)) ||
+      (round(appleX) === round(portalX1) &&
+        round(appleY) === round(portalY1)) ||
+      (round(appleX) === round(portalX2) && round(appleY) === round(portalY2))
+    ) {
+      movePortal();
+      for (let bodyPart = 0; bodyPart < snakeCoords.length; bodyPart++) {
+        if (
+          (round(snakeCoords[bodyPart][0]) === round(portalX1) &&
+            round(snakeCoords[bodyPart][1]) === round(portalY1)) ||
+          (round(snakeCoords[bodyPart][0]) === round(portalX2) &&
+            round(snakeCoords[bodyPart][1]) === round(portalY2))
+        ) {
+          portalX2 = currentX;
+          portalY2 = currentY;
+        }
+      }
+    }
   }
- rect(appleX, appleY, width / columns, height / rows);
 
+  rect(portalX1, portalY1, width / columns, height / rows);
+  rect(portalX2, portalY2, width / columns, height / rows);
 }
 
 function snakeBody() {
   snakeCoords.push([currentX, currentY]);
   if (!ateApple) {
     snakeCoords.shift();
-      }
-  else {
+  } else {
     ateApple = false;
   }
 }
 
-function killSnake() { // ADD ACTUALLY GOOD KILL LOGIC
-    if ((snakeCoords.some(arr => JSON.stringify(arr) === JSON.stringify([currentX, currentY])) || currentX >= width || currentX < 0 || currentY >= height || currentY < 0) && ! godMode ) {
-  currentX = width**width;
-  snakeCoords = [];
-} 
-
-
-
+function killSnake() {
+  // ADD ACTUALLY GOOD KILL LOGIC
+  if (
+    (snakeCoords.some(
+      (arr) => JSON.stringify(arr) === JSON.stringify([currentX, currentY])
+    ) ||
+      currentX >= width ||
+      currentX < 0 ||
+      currentY >= height ||
+      currentY < 0) &&
+    !godMode
+  ) {
+    currentX = width ** width;
+    snakeCoords = [];
+  }
 }
 
 function draw() {
@@ -138,7 +206,6 @@ function draw() {
   portal();
   killSnake();
   snakeBody();
-  
 }
 
 function keyPressed() {
