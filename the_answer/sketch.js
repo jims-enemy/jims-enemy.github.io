@@ -13,6 +13,7 @@ let portalX1;
 let portalX2;
 let portalY1;
 let portalY2;
+let gracePeriod = true;
 
 function moveApple() {
   appleX = (round(random(columns - 1)) * width) / columns;
@@ -67,10 +68,38 @@ function moveSnake() {
   } else {
     currentY -= height / rows;
   }
-
-  fill("green");
+  if (
+    (snakeCoords.some(
+      (arr) => JSON.stringify(arr) === JSON.stringify([currentX, currentY])
+    ) ||
+      currentX >= width ||
+      currentX < 0 ||
+      currentY >= height ||
+      currentY < 0) &&
+    !godMode
+  ) {
+    if (!gracePeriod) {
+    currentX = width ** width;
+    snakeCoords = [];
+    }
+    else {
+      gracePeriod = false;
+      if (direction === 0) {
+        currentX -= width / columns;
+      } else if (direction === 2) {
+        currentX += width / columns;
+      } else if (direction === 1) {
+        currentY -= height / rows;
+      } else {
+        currentY += height / rows;
+      }
+    }
+  }
+else {
+  gracePeriod = true; 
+} 
+  
   stroke("black");
-  rect(currentX, currentY, width / columns, height / rows);
   fill("white");
   for (let bodyPart = 0; bodyPart < snakeCoords.length; bodyPart++) {
     rect(
@@ -80,6 +109,8 @@ function moveSnake() {
       height / rows
     );
   }
+  fill("yellow");
+  rect(currentX, currentY, width / columns, height / rows);
 }
 
 function apple() {
@@ -172,6 +203,7 @@ function portal() {
 }
 
 function snakeBody() {
+  if (gracePeriod) {
   snakeCoords.push([currentX, currentY]);
   if (!ateApple) {
     snakeCoords.shift();
@@ -179,22 +211,6 @@ function snakeBody() {
     ateApple = false;
   }
 }
-
-function killSnake() {
-  // ADD ACTUALLY GOOD KILL LOGIC
-  if (
-    (snakeCoords.some(
-      (arr) => JSON.stringify(arr) === JSON.stringify([currentX, currentY])
-    ) ||
-      currentX >= width ||
-      currentX < 0 ||
-      currentY >= height ||
-      currentY < 0) &&
-    !godMode
-  ) {
-    currentX = width ** width;
-    snakeCoords = [];
-  }
 }
 
 function draw() {
@@ -204,7 +220,6 @@ function draw() {
   canTurn = true;
   apple();
   portal();
-  killSnake();
   snakeBody();
 }
 
