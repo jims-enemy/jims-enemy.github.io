@@ -1,20 +1,25 @@
-let columns = 1000;
+// works best if these are the same
+let columns = 20;
 let rows = 20;
+
+let godMode = false; //makes the snake INVINCIBLE
+
+let ateApple = false;
+let canTurn = true;
+let gracePeriod = true;
+
+let snakeCoords = [];
+
+// declaration of things to be changed in the setup function
 let currentX;
 let currentY;
-let direction;
 let appleX;
 let appleY;
-let snakeCoords = [];
-let ateApple = false;
-let godMode = false;
-let canTurn = true;
 let portalX1;
 let portalX2;
 let portalY1;
 let portalY2;
-let gracePeriod = true;
-
+let direction;
 
 
 function moveApple() {
