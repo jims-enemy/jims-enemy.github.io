@@ -1,4 +1,4 @@
-let columns = 20;
+let columns = 1000;
 let rows = 20;
 let currentX;
 let currentY;
@@ -15,33 +15,35 @@ let portalY1;
 let portalY2;
 let gracePeriod = true;
 
+
+
 function moveApple() {
-  appleX = (round(random(columns - 1)) * width) / columns;
-  appleY = (round(random(rows - 1)) * height) / rows;
+  appleX = round(random(columns - 1)) * width / columns;
+  appleY = round(random(rows - 1)) * height / rows;
 }
 
 function movePortal() {
-  portalX1 = (round(random(columns - 1)) * width) / columns;
-  portalY1 = (round(random(rows - 1)) * height) / rows;
-  portalX2 = (round(random(columns - 1)) * width) / columns;
-  portalY2 = (round(random(rows - 1)) * height) / rows;
+  portalX1 = round(random(columns - 1)) * width / columns;
+  portalY1 = round(random(rows - 1)) * height / rows;
+  portalX2 = round(random(columns - 1)) * width / columns;
+  portalY2 = round(random(rows - 1)) * height / rows;
 }
 
 function setup() {
   createCanvas(400, 400);
   while (
-    (currentX === appleX && currentY === appleY) ||
-    (direction === 0 && currentX > width / 2) ||
-    (direction === 2 && currentX < width / 2) ||
-    (direction === 1 && currentY > width / 2) ||
-    (direction === 3 && currentY < width / 2) ||
-    (currentX === portalX1 && currentY === portalY1) ||
-    (currentX === portalX2 && currentY === portalY2) ||
-    (appleX === portalX1 && appleY === portalY1) ||
-    (appleX === portalX2 && appleY === portalY2)
+    currentX === appleX && currentY === appleY ||
+    direction === 0 && currentX > width / 2 ||
+    direction === 2 && currentX < width / 2 ||
+    direction === 1 && currentY > width / 2 ||
+    direction === 3 && currentY < width / 2 ||
+    currentX === portalX1 && currentY === portalY1 ||
+    currentX === portalX2 && currentY === portalY2 ||
+    appleX === portalX1 && appleY === portalY1 ||
+    appleX === portalX2 && appleY === portalY2
   ) {
-    currentX = (round(random(columns - 1)) * width) / columns;
-    currentY = (round(random(rows - 1)) * height) / rows;
+    currentX = round(random(columns - 1)) * width / columns;
+    currentY = round(random(rows - 1)) * height / rows;
     direction = round(random(3));
     moveApple();
     movePortal();
@@ -51,8 +53,9 @@ function setup() {
 
 function grid() {
   stroke("white");
-  for (let lineX = 0; lineX <= width; lineX += width / columns)
+  for (let lineX = 0; lineX <= width; lineX += width / columns) {
     line(lineX, 0, lineX, height);
+  }
   for (let lineY = 0; lineY <= height; lineY += height / rows) {
     line(0, lineY, width, lineY);
   }
@@ -61,11 +64,14 @@ function grid() {
 function moveSnake() {
   if (direction === 0) {
     currentX += width / columns;
-  } else if (direction === 2) {
+  }
+  else if (direction === 2) {
     currentX -= width / columns;
-  } else if (direction === 1) {
+  }
+  else if (direction === 1) {
     currentY += height / rows;
-  } else {
+  }
+  else {
     currentY -= height / rows;
   }
   if (
@@ -79,25 +85,28 @@ function moveSnake() {
     !godMode
   ) {
     if (!gracePeriod) {
-    currentX = width ** width;
-    snakeCoords = [];
+      currentX = width ** width;
+      snakeCoords = [];
     }
     else {
       gracePeriod = false;
       if (direction === 0) {
         currentX -= width / columns;
-      } else if (direction === 2) {
+      }
+      else if (direction === 2) {
         currentX += width / columns;
-      } else if (direction === 1) {
+      }
+      else if (direction === 1) {
         currentY -= height / rows;
-      } else {
+      }
+      else {
         currentY += height / rows;
       }
     }
   }
-else {
-  gracePeriod = true; 
-} 
+  else {
+    gracePeriod = true; 
+  } 
   
   stroke("black");
   fill("white");
@@ -117,9 +126,9 @@ function apple() {
   noStroke();
   fill("red");
   while (
-    (round(currentX) === round(appleX) && round(currentY) === round(appleY)) ||
-    (round(appleX) === round(portalX1) && round(appleY) === round(portalY1)) ||
-    (round(appleX) === round(portalX2) && round(appleY) === round(portalY2))
+    round(currentX) === round(appleX) && round(currentY) === round(appleY) ||
+    round(appleX) === round(portalX1) && round(appleY) === round(portalY1) ||
+    round(appleX) === round(portalX2) && round(appleY) === round(portalY2)
   ) {
     moveApple();
     ateApple = true;
@@ -146,21 +155,21 @@ function portal() {
     currentX = portalX2;
     currentY = portalY2;
     while (
-      (round(currentX) === round(portalX1) &&
-        round(currentY) === round(portalY1)) ||
-      (round(currentX) === round(portalX2) &&
-        round(currentY) === round(portalY2)) ||
-      (round(appleX) === round(portalX1) &&
-        round(appleY) === round(portalY1)) ||
-      (round(appleX) === round(portalX2) && round(appleY) === round(portalY2))
+      round(currentX) === round(portalX1) &&
+        round(currentY) === round(portalY1) ||
+      round(currentX) === round(portalX2) &&
+        round(currentY) === round(portalY2) ||
+      round(appleX) === round(portalX1) &&
+        round(appleY) === round(portalY1) ||
+      round(appleX) === round(portalX2) && round(appleY) === round(portalY2)
     ) {
       movePortal();
       for (let bodyPart = 0; bodyPart < snakeCoords.length; bodyPart++) {
         if (
-          (round(snakeCoords[bodyPart][0]) === round(portalX1) &&
-            round(snakeCoords[bodyPart][1]) === round(portalY1)) ||
-          (round(snakeCoords[bodyPart][0]) === round(portalX2) &&
-            round(snakeCoords[bodyPart][1]) === round(portalY2))
+          round(snakeCoords[bodyPart][0]) === round(portalX1) &&
+            round(snakeCoords[bodyPart][1]) === round(portalY1) ||
+          round(snakeCoords[bodyPart][0]) === round(portalX2) &&
+            round(snakeCoords[bodyPart][1]) === round(portalY2)
         ) {
           portalX1 = currentX;
           portalY1 = currentY;
@@ -175,21 +184,21 @@ function portal() {
     currentX = portalX1;
     currentY = portalY1;
     while (
-      (round(currentX) === round(portalX1) &&
-        round(currentY) === round(portalY1)) ||
-      (round(currentX) === round(portalX2) &&
-        round(currentY) === round(portalY2)) ||
-      (round(appleX) === round(portalX1) &&
-        round(appleY) === round(portalY1)) ||
-      (round(appleX) === round(portalX2) && round(appleY) === round(portalY2))
+      round(currentX) === round(portalX1) &&
+        round(currentY) === round(portalY1) ||
+      round(currentX) === round(portalX2) &&
+        round(currentY) === round(portalY2) ||
+      round(appleX) === round(portalX1) &&
+        round(appleY) === round(portalY1) ||
+      round(appleX) === round(portalX2) && round(appleY) === round(portalY2)
     ) {
       movePortal();
       for (let bodyPart = 0; bodyPart < snakeCoords.length; bodyPart++) {
         if (
-          (round(snakeCoords[bodyPart][0]) === round(portalX1) &&
-            round(snakeCoords[bodyPart][1]) === round(portalY1)) ||
-          (round(snakeCoords[bodyPart][0]) === round(portalX2) &&
-            round(snakeCoords[bodyPart][1]) === round(portalY2))
+          round(snakeCoords[bodyPart][0]) === round(portalX1) &&
+            round(snakeCoords[bodyPart][1]) === round(portalY1) ||
+          round(snakeCoords[bodyPart][0]) === round(portalX2) &&
+            round(snakeCoords[bodyPart][1]) === round(portalY2)
         ) {
           portalX2 = currentX;
           portalY2 = currentY;
@@ -204,13 +213,14 @@ function portal() {
 
 function snakeBody() {
   if (gracePeriod) {
-  snakeCoords.push([currentX, currentY]);
-  if (!ateApple) {
-    snakeCoords.shift();
-  } else {
-    ateApple = false;
+    snakeCoords.push([currentX, currentY]);
+    if (!ateApple) {
+      snakeCoords.shift();
+    }
+    else {
+      ateApple = false;
+    }
   }
-}
 }
 
 function draw() {
@@ -228,15 +238,18 @@ function keyPressed() {
     // left arrow or a
     if (direction > 0) {
       direction--;
-    } else {
+    }
+    else {
       direction = 3;
     }
     canTurn = false;
-  } else if ((keyCode === 39 || keyCode === 68) && canTurn) {
+  }
+  else if ((keyCode === 39 || keyCode === 68) && canTurn) {
     // right arrow or d
     if (direction < 3) {
       direction++;
-    } else {
+    }
+    else {
       direction = 0;
     }
     canTurn = false;
