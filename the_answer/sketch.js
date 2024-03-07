@@ -23,11 +23,13 @@ let direction;
 
 
 function moveApple() {
+  /**Sets appleX and appleY to random values equivalent to grid coordinates.*/
   appleX = round(random(columns - 1)) * width / columns;
   appleY = round(random(rows - 1)) * height / rows;
 }
 
 function movePortal() {
+  /**Sets each portal's coordinates to random values equivalent to grid coordinates.*/
   portalX1 = round(random(columns - 1)) * width / columns;
   portalY1 = round(random(rows - 1)) * height / rows;
   portalX2 = round(random(columns - 1)) * width / columns;
@@ -35,7 +37,9 @@ function movePortal() {
 }
 
 function setup() {
-  createCanvas(400, 400);
+  createCanvas(400, 400); // Change this value to resize the window; works best with squares.
+
+  // Randomly sets each value and ensures none are the same and that you have a chance to react when it starts.
   while (
     currentX === appleX && currentY === appleY ||
     direction === 0 && currentX > width / 2 ||
@@ -53,14 +57,19 @@ function setup() {
     moveApple();
     movePortal();
   }
-  frameRate(8);
+  frameRate(8); // Change this value to change the speed. (Default: 8)
 }
 
 function grid() {
+  /**Draws a white grid with the amount of rows and columns equal to their variable counterparts.*/
   stroke("white");
+
+  // Draws columns.
   for (let lineX = 0; lineX <= width; lineX += width / columns) {
     line(lineX, 0, lineX, height);
   }
+
+  // Draws rows.
   for (let lineY = 0; lineY <= height; lineY += height / rows) {
     line(0, lineY, width, lineY);
   }
