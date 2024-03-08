@@ -39,18 +39,22 @@ function movePortal() {
 function setup() {
   createCanvas(400, 400); // Change this value to resize the window; works best with squares.
 
-  // Randomly sets each value and ensures none are the same and that you have a chance to react when it starts.
   while (
-    currentX === appleX && currentY === appleY ||
+    // The snake should start facing over half of the squares.
     direction === 0 && currentX > width / 2 ||
     direction === 2 && currentX < width / 2 ||
     direction === 1 && currentY > width / 2 ||
     direction === 3 && currentY < width / 2 ||
+
+    // Ensures nothing initially spawns on each other.
+    currentX === appleX && currentY === appleY ||
     currentX === portalX1 && currentY === portalY1 ||
     currentX === portalX2 && currentY === portalY2 ||
     appleX === portalX1 && appleY === portalY1 ||
     appleX === portalX2 && appleY === portalY2
   ) {
+
+    // Randomly sets initial values.
     currentX = round(random(columns - 1)) * width / columns;
     currentY = round(random(rows - 1)) * height / rows;
     direction = round(random(3));
@@ -76,32 +80,46 @@ function grid() {
 }
 
 function moveSnake() {
-  if (direction === 0) {
+  /**Updates currentX and currentY based on the current direction faced, and kills the snake when colliding with itself or leaving the boundaries if godMode is false, after a turn of nothing happening.*/
+  
+  // Updates snake's position.
+  if (direction === 0) { // Facing right.
     currentX += width / columns;
   }
-  else if (direction === 2) {
+  else if (direction === 2) { // Facing left.
     currentX -= width / columns;
   }
-  else if (direction === 1) {
+  else if (direction === 1) { // Facing down.
     currentY += height / rows;
   }
-  else {
+  else {  // Facing up.
     currentY -= height / rows;
   }
+
+  // Snake death logic.
   if (
+    
+    // The new position collides with a body part.  
     (snakeCoords.some(
       (arr) => JSON.stringify(arr) === JSON.stringify([currentX, currentY])
     ) ||
+    // The snake leaves the screen.
       currentX >= width ||
       currentX < 0 ||
       currentY >= height ||
       currentY < 0) &&
+
+    // Ignores all of this if godMode is on.  
     !godMode
   ) {
+    
+    // Kills the snake by permanently moving it off screen after giving the user a chance to recover.
     if (!gracePeriod) {
       currentX = width ** width;
       snakeCoords = [];
     }
+    
+    // Gives the user a chance to recover by moving the snake back to it's previous position for one turn.
     else {
       gracePeriod = false;
       if (direction === 0) {
@@ -118,10 +136,13 @@ function moveSnake() {
       }
     }
   }
+
+  // Resets gracePeriod if safe.
   else {
     gracePeriod = true; 
   } 
   
+  // Draws the snake's body.
   stroke("black");
   fill("white");
   for (let bodyPart = 0; bodyPart < snakeCoords.length; bodyPart++) {
@@ -132,11 +153,14 @@ function moveSnake() {
       height / rows
     );
   }
+
+  // Draws the snake's head.
   fill("yellow");
   rect(currentX, currentY, width / columns, height / rows);
 }
 
 function apple() {
+  /** */
   noStroke();
   fill("red");
   while (
