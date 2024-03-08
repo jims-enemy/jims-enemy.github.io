@@ -160,7 +160,7 @@ function moveSnake() {
 }
 
 function apple() {
-  /** */
+  /**Draws an apple at (appleX, appleY) and moves it if eaten.*/
   noStroke();
   fill("red");
   while (
