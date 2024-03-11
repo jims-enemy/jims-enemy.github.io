@@ -304,7 +304,7 @@ function draw() {
 }
 
 function keyPressed() {
-  // If the left arrow key or a is pressed,
+  // If the left arrow key or a is pressed, turns the snake left relative to where it is facing as long as no turns have already been performed that turn.
   if ((keyCode === 37 || keyCode === 65) && canTurn) {
     if (direction > 0) {
       direction--;
@@ -312,16 +312,19 @@ function keyPressed() {
     else {
       direction = 3;
     }
+
+    // Prevents the snake from turning twice in one turn.
     canTurn = false;
   }
+  // If the right arrow key or d is pressed, turns the snake right relative to where it is facing as long as no turns have already been performed that turn.
   else if ((keyCode === 39 || keyCode === 68) && canTurn) {
-    // right arrow or d
     if (direction < 3) {
       direction++;
     }
     else {
       direction = 0;
     }
+    // Prevents the snake from turning twice in one turn.
     canTurn = false;
   }
 }
