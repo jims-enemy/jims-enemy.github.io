@@ -163,6 +163,8 @@ function apple() {
   /**Draws an apple at (appleX, appleY) and moves it if eaten.*/
   noStroke();
   fill("red");
+
+  // While anything is currently colliding with the apple.
   while (
     round(currentX) === round(appleX) && round(currentY) === round(appleY) ||
     round(appleX) === round(portalX1) && round(appleY) === round(portalY1) ||
@@ -170,7 +172,10 @@ function apple() {
   ) {
     moveApple();
     ateApple = true;
+
+    // Iterates through each x and y coordinate of the snake's body.
     for (let bodyPart = 0; bodyPart < snakeCoords.length; bodyPart++) {
+      // If the current coordinate is the same as the apple's coordinates, teleports the apple to the snake's head to reset the loop.
       if (
         round(snakeCoords[bodyPart][0]) === round(appleX) &&
         round(snakeCoords[bodyPart][1]) === round(appleY)
@@ -180,18 +185,27 @@ function apple() {
       }
     }
   }
+  
+  // Draws the apple.
   rect(appleX, appleY, width / columns, height / rows);
 }
 
 function portal() {
+  /**Draws a portal at (portalX1, portalY1) and (portalX2, portalY2). Upon snake collision, teleports the snake head to the uncollided one and moves the portals.*/
   noStroke();
   fill("blue");
+
+  // Collision with portal 1.
   if (
     round(currentX) === round(portalX1) &&
     round(currentY) === round(portalY1)
   ) {
+
+    // Teleport the snake's head to the other portal.
     currentX = portalX2;
     currentY = portalY2;
+
+    // While either portal collides with anything.
     while (
       round(currentX) === round(portalX1) &&
         round(currentY) === round(portalY1) ||
@@ -202,7 +216,11 @@ function portal() {
       round(appleX) === round(portalX2) && round(appleY) === round(portalY2)
     ) {
       movePortal();
+
+      // Iterates through each coordinate of the snake's body.
       for (let bodyPart = 0; bodyPart < snakeCoords.length; bodyPart++) {
+
+        // If the current bodypart collides with either portal, teleport the first portal to the snake's head to restart the loop.
         if (
           round(snakeCoords[bodyPart][0]) === round(portalX1) &&
             round(snakeCoords[bodyPart][1]) === round(portalY1) ||
@@ -215,12 +233,18 @@ function portal() {
       }
     }
   }
+
+  // Collision with portal 2.
   if (
     round(currentX) === round(portalX2) &&
     round(currentY) === round(portalY2)
   ) {
+
+    // Teleport the snake's head to the other portal.
     currentX = portalX1;
     currentY = portalY1;
+
+    // While either portal collides with anything.
     while (
       round(currentX) === round(portalX1) &&
         round(currentY) === round(portalY1) ||
@@ -231,7 +255,11 @@ function portal() {
       round(appleX) === round(portalX2) && round(appleY) === round(portalY2)
     ) {
       movePortal();
+
+      // Iterates through each coordinate of the snake's body.
       for (let bodyPart = 0; bodyPart < snakeCoords.length; bodyPart++) {
+
+        // If the current bodypart collides with either portal, teleport the second portal to the snake's head to restart the loop.
         if (
           round(snakeCoords[bodyPart][0]) === round(portalX1) &&
             round(snakeCoords[bodyPart][1]) === round(portalY1) ||
@@ -245,16 +273,20 @@ function portal() {
     }
   }
 
+  // Draws both portals.
   rect(portalX1, portalY1, width / columns, height / rows);
   rect(portalX2, portalY2, width / columns, height / rows);
 }
 
 function snakeBody() {
+  /**As long as the snake isn't about to die, adds [currentX, currentY] to a snakeCoords and removes the last value if an apple hasn't been eaten that turn.*/
   if (gracePeriod) {
     snakeCoords.push([currentX, currentY]);
     if (!ateApple) {
       snakeCoords.shift();
     }
+
+    // Resets ateApple so the snake doesn't grow infinitely.
     else {
       ateApple = false;
     }
@@ -272,8 +304,8 @@ function draw() {
 }
 
 function keyPressed() {
+  // If the left arrow key or a is pressed,
   if ((keyCode === 37 || keyCode === 65) && canTurn) {
-    // left arrow or a
     if (direction > 0) {
       direction--;
     }
