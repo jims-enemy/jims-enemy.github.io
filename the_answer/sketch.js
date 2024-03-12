@@ -1,7 +1,6 @@
 // I have:
 // - included docstrings for each function,
-// - used arrays before they were introduced,
-// - and allowed for resizing of the window.
+// - and used arrays before they were introduced.
 
 
 // Works best if these are the same value as each other.
@@ -333,20 +332,4 @@ function keyPressed() {
     // Prevents the snake from turning twice in one turn.
     canTurn = false;
   }
-}
-
-function windowResized() {
-
-  // Updates each position to where it should now be relative to the window's new size.
-  currentX = currentX/width*windowWidth;
-  currentY = currentY/height*windowHeight;
-  appleX = appleX/width*windowWidth;
-  appleY = appleY/height*windowHeight;
-  portalX1 = portalX1/width*windowWidth;
-  portalX2 = portalX2/width*windowWidth;
-  portalY1 = portalY1/height*windowHeight;
-  portalY2 = portalY2/height*windowHeight;
-
-  // Updates the canvas.
-  resizeCanvas(windowHeight, windowHeight);
 }
