@@ -1,8 +1,14 @@
-// works best if these are the same
+// I have:
+// - included docstrings for each function,
+// - used arrays before they were introduced,
+// - and allowed for resizing of the window.
+
+
+// Works best if these are the same value as each other.
 let columns = 20;
 let rows = 20;
 
-let godMode = false; //makes the snake INVINCIBLE
+let godMode = false; // Makes the snake INVINCIBLE!
 
 let ateApple = false;
 let canTurn = true;
@@ -10,7 +16,7 @@ let gracePeriod = true;
 
 let snakeCoords = [];
 
-// declaration of things to be changed in the setup function
+// Declaration of things to be changed in the setup function.
 let currentX;
 let currentY;
 let appleX;
@@ -37,7 +43,7 @@ function movePortal() {
 }
 
 function setup() {
-  createCanvas(400, 400); // Change this value to resize the window; works best with squares.
+  createCanvas(windowHeight, windowHeight);
 
   while (
     // The snake should start facing over half of the squares.
@@ -327,4 +333,20 @@ function keyPressed() {
     // Prevents the snake from turning twice in one turn.
     canTurn = false;
   }
+}
+
+function windowResized() {
+
+  // Updates each position to where it should now be relative to the window's new size.
+  currentX = currentX/width*windowWidth;
+  currentY = currentY/height*windowHeight;
+  appleX = appleX/width*windowWidth;
+  appleY = appleY/height*windowHeight;
+  portalX1 = portalX1/width*windowWidth;
+  portalX2 = portalX2/width*windowWidth;
+  portalY1 = portalY1/height*windowHeight;
+  portalY2 = portalY2/height*windowHeight;
+
+  // Updates the canvas.
+  resizeCanvas(windowHeight, windowHeight);
 }
