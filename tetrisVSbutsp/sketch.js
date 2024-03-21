@@ -2,6 +2,17 @@ let columnLines = 10;
 let rowLines = 20;
 let tetrisBoards = new Map();
 let games = 9; // Does NOT work with 2 or less.
+let bag = [];
+let activeTetromino = {color: NaN,
+  isActive: false,
+  column1: NaN,
+  row1: NaN,
+  column2: NaN,
+  row2: NaN,
+  column3: NaN,
+  row3: NaN,
+  column4: NaN,
+  row4: NaN};
 for (let board = 0; board < games; board++) {
   let boardMap = new Map();
   boardMap.set("minos", []);
@@ -26,6 +37,7 @@ function setup() {
       currentGame++;
     }
   }
+  fillBag();
 }
 
 function draw() {
@@ -35,6 +47,7 @@ function draw() {
   }
   
   drawMinos();
+  moveActiveTetromino();
 }
 
 function windowResized() {
@@ -86,4 +99,130 @@ function swap() {
   }
   tetrisBoards.set(`tetrisGame${numberOfGame - 1}`, gameZero);
   windowResized();
+}
+
+function fillBag() {
+  let loops = 0;
+  let availableChoices = [1, 2, 3, 4, 5, 6, 7, 8];
+
+  while(loops < 8) {
+    let choice = round(random(0.45, 8.43));
+    if (availableChoices.includes(choice)) {
+      bag.push(choice);
+      availableChoices.splice(availableChoices.indexOf(choice), 1);
+      loops++;
+    }
+  }
+}
+
+function moveActiveTetromino() {
+  if (activeTetromino.isActive) {
+    fill(activeTetromino.color);
+    for (let columnRow of [[activeTetromino.column1, activeTetromino.row1], [activeTetromino.column2, activeTetromino.row2], [activeTetromino.column3, activeTetromino.row3], [activeTetromino.column4, activeTetromino.row4]]) {
+      rect(columnRow[0] * (tetrisBoards.get("tetrisGame0").get("x2") - tetrisBoards.get("tetrisGame0").get("x1"))/columnLines + tetrisBoards.get("tetrisGame0").get("x1"),
+        columnRow[1] * (tetrisBoards.get("tetrisGame0").get("y2") - tetrisBoards.get("tetrisGame0").get("y1"))/rowLines + tetrisBoards.get("tetrisGame0").get("y1"), 
+        (tetrisBoards.get("tetrisGame0").get("x2") - tetrisBoards.get("tetrisGame0").get("x1"))/columnLines,
+        (tetrisBoards.get("tetrisGame0").get("y2") - tetrisBoards.get("tetrisGame0").get("y1"))/rowLines);
+    }
+  }
+  else {
+    if (bag[0] === 1) { //SWAP
+      swap();
+    }
+    else if (bag[0] === 2) { //I
+      activeTetromino = {color: "cyan",
+        isActive: true, 
+        column1: Math.floor(columnLines/2) - 2,
+        row1: -1,
+        column2: Math.floor(columnLines/2) - 1,
+        row2: -1,
+        column3: Math.floor(columnLines/2),
+        row3: -1,
+        column4: Math.floor(columnLines/2) + 1,
+        row4: -1
+      };
+    }
+    else if (bag[0] === 3) { //J
+      activeTetromino = {color: "blue",
+        isActive: true,
+        column1: Math.floor(columnLines/2) - 2,
+        row1: -1,
+        column2: Math.floor(columnLines/2) - 2,
+        row2: 0,
+        column3: Math.floor(columnLines/2) - 1,
+        row3: 0,
+        column4: Math.floor(columnLines/2),
+        row4: 0
+      };
+    }
+    else if (bag[0] === 4) { //L
+      activeTetromino = {color: "orange",
+        isActive: true,
+        column1: Math.floor(columnLines/2) - 2,
+        row1: 0,
+        column2: Math.floor(columnLines/2) - 1,
+        row2: 0,
+        column3: Math.floor(columnLines/2),
+        row3: 0,
+        column4: Math.floor(columnLines/2),
+        row4: -1
+      };
+    }
+    else if (bag[0] === 5) { //O
+      activeTetromino = {color: "yellow",
+        isActive: true,
+        column1: Math.floor(columnLines/2) - 1,
+        row1: -1,
+        column2: Math.floor(columnLines/2) - 1,
+        row2: 0,
+        column3: Math.floor(columnLines/2),
+        row3: -1,
+        column4: Math.floor(columnLines/2),
+        row4: 0
+      };
+    }
+    else if (bag[0] === 6) { //S
+      activeTetromino = {color: "green",
+        isActive: true,
+        column1: Math.floor(columnLines/2) - 2,
+        row1: 0,
+        column2: Math.floor(columnLines/2) - 1,
+        row2: 0,
+        column3: Math.floor(columnLines/2) - 1,
+        row3: -1,
+        column4: Math.floor(columnLines/2),
+        row4: -1
+      };
+    }
+    else if (bag[0] === 7) { //Z
+      activeTetromino = {color: "red",
+        isActive: true,
+        column1: Math.floor(columnLines/2) - 2,
+        row1: -1,
+        column2: Math.floor(columnLines/2) - 1,
+        row2: -1,
+        column3: Math.floor(columnLines/2) - 1,
+        row3: 0,
+        column4: Math.floor(columnLines/2),
+        row4: 0
+      };
+    }
+    else { //T
+      activeTetromino = {color: "purple",
+        isActive: true,
+        column1: Math.floor(columnLines/2) - 2,
+        row1: 0,
+        column2: Math.floor(columnLines/2) - 1,
+        row2: -1,
+        column3: Math.floor(columnLines/2) - 1,
+        row3: 0,
+        column4: Math.floor(columnLines/2),
+        row4: 0
+      };
+    }
+    bag.shift();
+  }
+  if (bag.length < 7) {
+    fillBag();
+  }
 }
