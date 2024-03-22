@@ -1,26 +1,26 @@
 let columnLines = 10;
 let rowLines = 20;
 let tetrisBoards = new Map();
-let games = 9; // Does NOT work with 2 or less.
+let games = 20; // Does NOT work with 2 or less.
 let bag = [];
 let level = 1;
 let timer;
 let lastUpdate = 0;
-let activeTetromino = {color: NaN,
-  isActive: false,
-  column1: NaN,
-  row1: NaN,
-  column2: NaN,
-  row2: NaN,
-  column3: NaN,
-  row3: NaN,
-  column4: NaN,
-  row4: NaN};
+let activeTetromino = {isActive: false};
+let blockUnder = false;
 for (let board = 0; board < games; board++) {
   let boardMap = new Map();
   boardMap.set("minos", []);
   tetrisBoards.set(`tetrisGame${board}`, boardMap);
 }
+
+const SWAP = 1;
+const I = 2;
+const J = 3;
+const L = 4;
+const O = 5;
+const S = 6;
+const Z = 7;
 
 
 function setup() {
@@ -134,10 +134,19 @@ function moveActiveTetromino() {
       }
     }
     if (timer - lastUpdate >= (0.8 - (level - 1) * 0.007)**(level - 1) * 1000) {
+      for (let minoToCheck of tetrisBoards.get("tetrisGame0").get("minos")) {
+        if (minoToCheck.row === activeTetromino.row1 + 1 && minoToCheck.column === activeTetromino.column1 || 
+          minoToCheck.row === activeTetromino.row2 + 1 && minoToCheck.column === activeTetromino.column2 ||
+          minoToCheck.row === activeTetromino.row3 + 1 && minoToCheck.column === activeTetromino.column3 || 
+          minoToCheck.row === activeTetromino.row4 + 1 && minoToCheck.column === activeTetromino.column4) {
+          blockUnder = true;
+        }
+      }
       if (activeTetromino.row1 + 1 < rowLines &&
         activeTetromino.row2 + 1 < rowLines &&
         activeTetromino.row3 + 1 < rowLines &&
-        activeTetromino.row4 + 1 < rowLines) {
+        activeTetromino.row4 + 1 < rowLines &&
+        ! blockUnder) {
         activeTetromino.row1++;
         activeTetromino.row2++;
         activeTetromino.row3++;
@@ -153,15 +162,16 @@ function moveActiveTetromino() {
             column: currentBlock[1]});
         }
         activeTetromino.isActive = false;
+        blockUnder = false;
       }
       lastUpdate = timer;
     }
   }
   else {
-    if (bag[0] === 1) { //SWAP
+    if (bag[0] === SWAP) {
       swap();
     }
-    else if (bag[0] === 2) { //I
+    else if (bag[0] === I) {
       activeTetromino = {color: "cyan",
         isActive: true, 
         column1: Math.floor(columnLines/2) - 2,
@@ -174,7 +184,7 @@ function moveActiveTetromino() {
         row4: -1
       };
     }
-    else if (bag[0] === 3) { //J
+    else if (bag[0] === J) {
       activeTetromino = {color: "blue",
         isActive: true,
         column1: Math.floor(columnLines/2) - 2,
@@ -187,7 +197,7 @@ function moveActiveTetromino() {
         row4: 0
       };
     }
-    else if (bag[0] === 4) { //L
+    else if (bag[0] === L) {
       activeTetromino = {color: "orange",
         isActive: true,
         column1: Math.floor(columnLines/2) - 2,
@@ -200,7 +210,7 @@ function moveActiveTetromino() {
         row4: -1
       };
     }
-    else if (bag[0] === 5) { //O
+    else if (bag[0] === O) {
       activeTetromino = {color: "yellow",
         isActive: true,
         column1: Math.floor(columnLines/2) - 1,
@@ -213,7 +223,7 @@ function moveActiveTetromino() {
         row4: 0
       };
     }
-    else if (bag[0] === 6) { //S
+    else if (bag[0] === S) {
       activeTetromino = {color: "green",
         isActive: true,
         column1: Math.floor(columnLines/2) - 2,
@@ -226,7 +236,7 @@ function moveActiveTetromino() {
         row4: -1
       };
     }
-    else if (bag[0] === 7) { //Z
+    else if (bag[0] === Z) {
       activeTetromino = {color: "red",
         isActive: true,
         column1: Math.floor(columnLines/2) - 2,
