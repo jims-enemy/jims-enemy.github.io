@@ -276,7 +276,21 @@ function moveActiveTetromino() {
 }
 
 function controlTetris() {
-
-  if ((keyIsDown === ARROW_LEFT || keyIsDown === A) && ! obstructionOnSide) {
+  if ((keyIsDown(LEFT_ARROW) || keyIsDown(KEY_A)) && activeTetromino.column1 - 1 >= 0) {
+    for (let minoToCheck of tetrisBoards.get("tetrisGame0").get("minos")) {
+      if (minoToCheck.column === activeTetromino.column - 1 && minoToCheck.row === activeTetromino.row1 || 
+        minoToCheck.column === activeTetromino.column2 - 1 && minoToCheck.row === activeTetromino.row2 ||
+        minoToCheck.column === activeTetromino.column3 - 1 && minoToCheck.row === activeTetromino.row3 || 
+        minoToCheck.column === activeTetromino.column4 - 1 && minoToCheck.row === activeTetromino.row4) {
+        obstructionOnSide = true;
+      }
+    }
+    if(!obstructionOnSide) {
+      activeTetromino.column1--;
+      activeTetromino.column2--;
+      activeTetromino.column3--;
+      activeTetromino.column4--;
+    }
+    obstructionOnSide = false;
   }
 }
