@@ -8,6 +8,7 @@ let timer;
 let lastUpdate = 0;
 let activeTetromino = {isActive: false};
 let blockUnder = false;
+let obstructionOnSide = false;
 for (let board = 0; board < games; board++) {
   let boardMap = new Map();
   boardMap.set("minos", []);
@@ -21,6 +22,11 @@ const L = 4;
 const O = 5;
 const S = 6;
 const Z = 7;
+
+const ARROW_LEFT = 37;
+const ARROW_RIGHT = 39;
+const KEY_D = 68;
+const KEY_A = 65;
 
 
 function setup() {
@@ -49,8 +55,8 @@ function draw() {
   for(let gameNumber = 0; gameNumber < games; gameNumber++) {
     drawGrid(tetrisBoards.get(`tetrisGame${gameNumber}`));
   }
-  
   drawMinos();
+  controlTetris();
   moveActiveTetromino();
 }
 
@@ -266,5 +272,11 @@ function moveActiveTetromino() {
   }
   if (bag.length < 7) {
     fillBag();
+  }
+}
+
+function controlTetris() {
+
+  if ((keyIsDown === ARROW_LEFT || keyIsDown === A) && ! obstructionOnSide) {
   }
 }
