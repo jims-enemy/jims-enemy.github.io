@@ -15,6 +15,10 @@ let leftTimeHeld = 0;
 let rightTimeHeld = 0;
 let softDrop = false;
 let softDropSpeed = 25;
+let lockDelay = 500;
+let safeToDrop = true;
+let hardDropped = false;
+let hardDrop = false;
 
 for (let board = 0; board < games; board++) {
   let boardMap = new Map();
@@ -65,7 +69,9 @@ function draw() {
     drawGrid(tetrisBoards.get(`tetrisGame${gameNumber}`));
   }
   drawMinos();
-  controlTetris();
+  if (hardDrop === false) {
+    controlTetris();
+  }
   moveActiveTetromino();
 }
 
@@ -148,7 +154,7 @@ function moveActiveTetromino() {
           (tetrisBoards.get("tetrisGame0").get("y2") - tetrisBoards.get("tetrisGame0").get("y1"))/rowLines);
       }
     }
-    if (timer - lastUpdate >= (0.8 - (level - 1) * 0.007)**(level - 1) * 1000 || softDrop && timer - lastUpdate >= softDropSpeed) {
+    if ((timer - lastUpdate >= (0.8 - (level - 1) * 0.007)**(level - 1) * 1000 || softDrop && timer - lastUpdate >= softDropSpeed) && hardDrop !== "movePiece") {
       for (let minoToCheck of tetrisBoards.get("tetrisGame0").get("minos")) {
         if (minoToCheck.row === activeTetromino.row1 + 1 && minoToCheck.column === activeTetromino.column1 || 
           minoToCheck.row === activeTetromino.row2 + 1 && minoToCheck.column === activeTetromino.column2 ||
@@ -166,8 +172,9 @@ function moveActiveTetromino() {
         activeTetromino.row2++;
         activeTetromino.row3++;
         activeTetromino.row4++;
+        lastUpdate = timer;
       }
-      else {
+      else if (timer - lastUpdate >= lockDelay) {
         for (let currentBlock of [[activeTetromino.row1, activeTetromino.column1],
           [activeTetromino.row2, activeTetromino.column2],
           [activeTetromino.row3, activeTetromino.column3],
@@ -177,9 +184,33 @@ function moveActiveTetromino() {
             column: currentBlock[1]});
         }
         activeTetromino.isActive = false;
-        blockUnder = false;
+        hardDrop = false;
       }
-      lastUpdate = timer;
+      blockUnder = false;
+    }
+    else if (hardDrop) {
+      let spacesToDrop = rowLines - activeTetromino.row1 + 2;
+      while (activeTetromino.row1 + spacesToDrop >= rowLines ||
+        activeTetromino.row2 + spacesToDrop >= rowLines ||
+        activeTetromino.row3 + spacesToDrop >= rowLines ||
+        activeTetromino.row4 + spacesToDrop >= rowLines ||
+        !safeToDrop) {
+        spacesToDrop--;
+        safeToDrop = true;
+        for (let minoToCheck of tetrisBoards.get("tetrisGame0").get("minos")) {
+          if (minoToCheck.row === activeTetromino.row1 + spacesToDrop && minoToCheck.column === activeTetromino.column1 || 
+            minoToCheck.row === activeTetromino.row2 + spacesToDrop && minoToCheck.column === activeTetromino.column2 ||
+            minoToCheck.row === activeTetromino.row3 + spacesToDrop && minoToCheck.column === activeTetromino.column3 || 
+            minoToCheck.row === activeTetromino.row4 + spacesToDrop && minoToCheck.column === activeTetromino.column4) {
+            safeToDrop = false;
+          }
+        }
+      }
+      activeTetromino.row1+= spacesToDrop;
+      activeTetromino.row2+= spacesToDrop;
+      activeTetromino.row3+= spacesToDrop;
+      activeTetromino.row4+= spacesToDrop;
+      hardDrop = false;
     }
   }
   else {
@@ -342,5 +373,13 @@ function controlTetris() {
   }
   else {
     softDrop = false;
+  }
+
+  if (keyIsDown(SPACE) && hardDropped === false) {
+    hardDropped = true;
+    hardDrop = "movePiece";
+  }
+  else {
+    hardDropped = false;
   }
 }
