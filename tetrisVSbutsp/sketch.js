@@ -1,14 +1,21 @@
 let columnLines = 10;
 let rowLines = 20;
 let tetrisBoards = new Map();
-let games = 20; // Does NOT work with 2 or less.
+let games = 3; // Does NOT work with 2 or less.
 let bag = [];
 let level = 1;
 let timer;
 let lastUpdate = 0;
 let activeTetromino = {isActive: false};
 let blockUnder = false;
-let obstructionOnSide = false;
+let obstructionOnLeftSide = false;
+let obstructionOnRightSide = false;
+let holdDelay = 10;
+let leftTimeHeld = 0;
+let rightTimeHeld = 0;
+let softDrop = false;
+let softDropSpeed = 25;
+
 for (let board = 0; board < games; board++) {
   let boardMap = new Map();
   boardMap.set("minos", []);
@@ -25,9 +32,11 @@ const Z = 7;
 
 const ARROW_LEFT = 37;
 const ARROW_RIGHT = 39;
+const ARROW_DOWN = 40;
 const KEY_D = 68;
 const KEY_A = 65;
-
+const KEY_S = 83;
+const SPACE = 32;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -139,7 +148,7 @@ function moveActiveTetromino() {
           (tetrisBoards.get("tetrisGame0").get("y2") - tetrisBoards.get("tetrisGame0").get("y1"))/rowLines);
       }
     }
-    if (timer - lastUpdate >= (0.8 - (level - 1) * 0.007)**(level - 1) * 1000) {
+    if (timer - lastUpdate >= (0.8 - (level - 1) * 0.007)**(level - 1) * 1000 || softDrop && timer - lastUpdate >= softDropSpeed) {
       for (let minoToCheck of tetrisBoards.get("tetrisGame0").get("minos")) {
         if (minoToCheck.row === activeTetromino.row1 + 1 && minoToCheck.column === activeTetromino.column1 || 
           minoToCheck.row === activeTetromino.row2 + 1 && minoToCheck.column === activeTetromino.column2 ||
@@ -276,21 +285,62 @@ function moveActiveTetromino() {
 }
 
 function controlTetris() {
-  if ((keyIsDown(LEFT_ARROW) || keyIsDown(KEY_A)) && activeTetromino.column1 - 1 >= 0) {
+  if ((keyIsDown(LEFT_ARROW) || keyIsDown(KEY_A)) && 
+  activeTetromino.column1 - 1 >= 0 &&
+  activeTetromino.column2 - 1 >= 0 &&
+  activeTetromino.column3 - 1 >= 0 &&
+  activeTetromino.column4 - 1 >= 0) {
     for (let minoToCheck of tetrisBoards.get("tetrisGame0").get("minos")) {
-      if (minoToCheck.column === activeTetromino.column - 1 && minoToCheck.row === activeTetromino.row1 || 
+      if (minoToCheck.column === activeTetromino.column1 - 1 && minoToCheck.row === activeTetromino.row1 || 
         minoToCheck.column === activeTetromino.column2 - 1 && minoToCheck.row === activeTetromino.row2 ||
         minoToCheck.column === activeTetromino.column3 - 1 && minoToCheck.row === activeTetromino.row3 || 
         minoToCheck.column === activeTetromino.column4 - 1 && minoToCheck.row === activeTetromino.row4) {
-        obstructionOnSide = true;
+        obstructionOnLeftSide = true;
       }
     }
-    if(!obstructionOnSide) {
+    if(!obstructionOnLeftSide && (leftTimeHeld === 0 || leftTimeHeld >= holdDelay)) {
       activeTetromino.column1--;
       activeTetromino.column2--;
       activeTetromino.column3--;
       activeTetromino.column4--;
     }
-    obstructionOnSide = false;
+    obstructionOnLeftSide = false;
+    leftTimeHeld++;
+  }
+  else {
+    leftTimeHeld = 0;
+  }
+
+  if ((keyIsDown(RIGHT_ARROW) || keyIsDown(KEY_D)) &&
+  activeTetromino.column4 + 1 < columnLines && 
+  activeTetromino.column3 + 1 < columnLines && 
+  activeTetromino.column2 + 1 < columnLines && 
+  activeTetromino.column1 + 1 < columnLines) {
+    for (let minoToCheck of tetrisBoards.get("tetrisGame0").get("minos")) {
+      if (minoToCheck.column === activeTetromino.column1 + 1 && minoToCheck.row === activeTetromino.row1 || 
+        minoToCheck.column === activeTetromino.column2 + 1 && minoToCheck.row === activeTetromino.row2 ||
+        minoToCheck.column === activeTetromino.column3 + 1 && minoToCheck.row === activeTetromino.row3 || 
+        minoToCheck.column === activeTetromino.column4 + 1 && minoToCheck.row === activeTetromino.row4) {
+        obstructionOnRightSide = true;
+      }
+    }
+    if(!obstructionOnRightSide && (rightTimeHeld === 0 || rightTimeHeld >= holdDelay)) {
+      activeTetromino.column1++;
+      activeTetromino.column2++;
+      activeTetromino.column3++;
+      activeTetromino.column4++;
+    }
+    obstructionOnRightSide = false;
+    rightTimeHeld++;
+  }
+  else {
+    rightTimeHeld = 0;
+  }
+
+  if (keyIsDown(ARROW_DOWN) || keyIsDown(S)) {
+    softDrop = true;
+  }
+  else {
+    softDrop = false;
   }
 }
