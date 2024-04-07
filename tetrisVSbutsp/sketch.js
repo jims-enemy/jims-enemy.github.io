@@ -491,7 +491,7 @@ function rotateTetromino(clockwise) {
     activeTetromino.column4 += activeTetromino.blockChange4[1];
     activeTetromino.row4 -= activeTetromino.blockChange4[0];
   }
-  for (let kickTests = 0; invalidRotation === true && kickTests < 4; kickTests++) {
+  for (let kickTests = 0; invalidRotation === true && kickTests < 5; kickTests++) {
     invalidRotation = false;
     for (let checkMino of tetrisBoards.get("tetrisGame0").get("minos")) {
       for (let tetrominoMino of [[activeTetromino.column1, activeTetromino.row1],
@@ -512,11 +512,13 @@ function rotateTetromino(clockwise) {
       if (activeTetromino.color === "cyan" && 
       (activeTetromino.rotation !== 1 &&
         activeTetromino.rotation !== 3 ||
-        ! clockwise) && 
+        ! clockwise ||
+        kickTests === 1) && 
       (activeTetromino.rotation !== 0 &&
-        activeTetromino.rotation !== 2 || 
+        (activeTetromino.rotation !== 2 ||
+          kickTests === 1) || 
         clockwise)) {
-        if (activeTetromino.rotation === 0 && clockwise || activeTetromino.rotation === 3 && ! clockwise) {
+        if (activeTetromino.rotation === 0 && clockwise || activeTetromino.rotation === 3 && ! clockwise || activeTetromino.roation === 1 && clockwise) {
           if (kickTests === 0) {
             activeTetromino.column1 -= 2;
             activeTetromino.column2 -= 2;
@@ -530,7 +532,7 @@ function rotateTetromino(clockwise) {
             activeTetromino.column4 += 3;
           }
         }
-        else if (activeTetromino.rotation === 1 && ! clockwise || activeTetromino.rotation === 2 && clockwise) {
+        else {
           if (kickTests === 0) {
             activeTetromino.column1 += 2;
             activeTetromino.column2 += 2;
@@ -553,11 +555,13 @@ function rotateTetromino(clockwise) {
           ! clockwise || 
           activeTetromino.rotation === 3)) {
         if (((activeTetromino.rotation === 0 ||
-              activeTetromino.rotation === 3 ||
+              activeTetromino.rotation === 3 &&
+              activeTetromino.color !== "cyan" ||
               activeTetromino.rotation === 1 &&
               activeTetromino.color === "cyan") &&
             clockwise ||
-            (activeTetromino.rotation === 2 ||
+            (activeTetromino.rotation === 2 &&
+              activeTetromino.color !== "cyan" ||
               activeTetromino.rotation === 3 ||
               activeTetromino.rotation === 0 &&
               activeTetromino.color === "cyan") &&
@@ -580,32 +584,32 @@ function rotateTetromino(clockwise) {
       else if (kickTests === 1) {
         if (activeTetromino.rotation === 0 ||
           activeTetromino.rotation === 2) {
-          activeTetromino.row1 += 1;
-          activeTetromino.row2 += 1;
-          activeTetromino.row3 += 1;
-          activeTetromino.row4 += 1;
-        }
-        else {
           activeTetromino.row1 -= 1;
           activeTetromino.row2 -= 1;
           activeTetromino.row3 -= 1;
           activeTetromino.row4 -= 1;
+        }
+        else {
+          activeTetromino.row1 += 1;
+          activeTetromino.row2 += 1;
+          activeTetromino.row3 += 1;
+          activeTetromino.row4 += 1;
         }
       }
 
       if (kickTests === 2) {
         if (activeTetromino.rotation === 0 || 
           activeTetromino.rotation === 2) {
-          activeTetromino.row1 -= 3;
-          activeTetromino.row2 -= 3;
-          activeTetromino.row3 -= 3;
-          activeTetromino.row4 -= 3;
-        }
-        else {
           activeTetromino.row1 += 3;
           activeTetromino.row2 += 3;
           activeTetromino.row3 += 3;
           activeTetromino.row4 += 3;
+        }
+        else {
+          activeTetromino.row1 -= 3;
+          activeTetromino.row2 -= 3;
+          activeTetromino.row3 -= 3;
+          activeTetromino.row4 -= 3;
         }
       }
     }
