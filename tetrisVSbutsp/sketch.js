@@ -1,3 +1,13 @@
+// NOT FINISHED
+
+// Controls: A/Left Arrow + D/Right Arrow to move,
+// Space to hard drop,
+// Down arrow to soft drop,
+// Up arrow, W, or X to rotate clockwise,
+// CTRL or Z to rotate counterclockwise.
+
+// Extras for experts: Among other things that I haven't mentioned here, the two main concepts that I have used that we have not been taught yet are 2d Arrays and Maps.
+
 let columnLines = 10;
 let rowLines = 20;
 let tetrisBoards = new Map();
