@@ -7,6 +7,7 @@
 // CTRL or Z to rotate counterclockwise.
 
 // Extras for experts: Among other things that I haven't mentioned here, the two main concepts that I have used that we have not been taught yet are 2d Arrays and Maps.
+// I have also still used doc-strings, and included constants as suggested.
 
 let columnLines = 10;
 let rowLines = 20;
