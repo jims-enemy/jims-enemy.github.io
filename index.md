@@ -8,3 +8,4 @@
 # Projects
 - [Interactive Scene](the_answer)
 - [Arrays and Object Notation Assignment](tetrisVSbutsp)
+- [2D Arrays Assignment] (infiniteTicTacToe)
