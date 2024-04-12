@@ -4,8 +4,9 @@
 - [Generative Art Demo](06-art)
 - [Terrain Generation](07-terrain)
 - [Bubble Movement](09_bubble)
+- [2D Array Demo](10-grid)
 
 # Projects
 - [Interactive Scene](the_answer)
 - [Arrays and Object Notation Assignment](tetrisVSbutsp)
-- [2D Arrays Assignment] (infiniteTicTacToe)
+- [2D Arrays Assignment](infiniteTicTacToe)
