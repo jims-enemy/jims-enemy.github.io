@@ -15,33 +15,35 @@
 
 let grid;
 let cellSize;
-let neighboorhood = true;
-
 const GRID_SIZE = 10;
+let toggleStyle = "self";
 
 function setup() {
-  createCanvas(windowWidth, windowHeight);
+  //make the canvas the largest square that you can...
+  if (windowWidth < windowHeight) {
+    createCanvas(windowWidth, windowWidth);
+  }
+  else {
+    createCanvas(windowHeight, windowHeight);
+  }
 
   //if randomizing the grid, do this:
   grid = generateRandomGrid(GRID_SIZE, GRID_SIZE);
   
-  if (height < width) {
-    cellSize = height/grid.length;
-  }
-  else {
-    cellSize = width/grid.length;
-  }
+  //this is dumb -- should check if this is the right size!
+  cellSize = height/grid.length;
 }
 
 function windowResized() {
-  resizeCanvas(windowWidth, windowHeight);
-  
-  if (height < width) {
-    cellSize = height/grid.length;
+  //make the canvas the largest square that you can...
+  if (windowWidth < windowHeight) {
+    resizeCanvas(windowWidth, windowWidth);
   }
   else {
-    cellSize = width/grid.length;
+    resizeCanvas(windowHeight, windowHeight);
   }
+
+  cellSize = height/grid.length;
 }
 
 function draw() {
@@ -57,39 +59,79 @@ function keyPressed() {
   if (key === "e") {
     grid = generateEmptyGrid(GRID_SIZE, GRID_SIZE);
   }
-  
+
   if (key === "n") {
-    neighboorhood = true;
+    toggleStyle = "neighbours";
   }
 
   if (key === "s") {
-    neighboorhood = false;
+    toggleStyle = "self";
+  }
+
+  if (key === " ") {
+    updateGrid();
   }
 }
+
+function updateGrid() {
+  let nextTurn = generateEmptyGrid(GRID_SIZE, GRID_SIZE);
+
+  for (let y = 0; y < GRID_SIZE; y++) {
+    for (let x = 0; x < GRID_SIZE; x++){
+      let neighbours = -1;
+      for (let i = -1; i <= 1; i++) {
+        for (let j = -1; j <= 1; j++) {
+          if (x + j >= 0 && x + j < GRID_SIZE && y + i >= 0 && y + i < GRID_SIZE && (x !== 0 || y !== 0)) {
+            neighbours += grid[y + i][x + j];
+          }
+        }
+      }
+
+      if (grid[y][x] === 1) {
+        if (neighbours === 2 || neighbours === 3) {
+          nextTurn[y][x] = 1;
+        }
+      }
+
+      if (grid[y][x] === 0) {
+        if (neighbours === 3) {
+          nextTurn[y][x] = 1;
+        }
+      }
+    }
+  }
+
+  grid = nextTurn;
+}
+
 
 function mousePressed() {
   let x = Math.floor(mouseX/cellSize);
   let y = Math.floor(mouseY/cellSize);
 
-  // console.log(x, y);
+  //toggle self
+  toggleCell(x, y);
 
-  //don't fall off the edge of the grid...
-  for (let toggledCell of [[x, y], [x + 1, y], [x, y + 1], [x - 1, y], [x, y - 1]]) {
-    if (toggledCell[0] < GRID_SIZE && toggledCell[1] < GRID_SIZE
-        && toggledCell[0] >= 0 && toggledCell[1] >= 0 &&
-        (neighboorhood || toggledCell[0] === x && toggledCell[1] === y)) {
-      toggleCell(toggledCell[0], toggledCell[1]); 
-    }
+  // and NESW neighbours, if style is set to neighbours
+  if (toggleStyle === "neighbours") {
+    toggleCell(x + 1, y);
+    toggleCell(x - 1, y);
+    toggleCell(x, y + 1);
+    toggleCell(x, y - 1);
   }
 }
 
 function toggleCell(x, y) {
-  //toggle the color of the cell
-  if (grid[y][x] === 0) {
-    grid[y][x] = 1;
-  }
-  else {
-    grid[y][x] = 0;
+  // make sure the cell you're toggling is in the grid...
+  if (x < GRID_SIZE && y < GRID_SIZE &&
+      x >= 0 && y >= 0) {
+    //toggle the color of the cell
+    if (grid[y][x] === 0) {
+      grid[y][x] = 1;
+    }
+    else {
+      grid[y][x] = 0;
+    }
   }
 }
 
