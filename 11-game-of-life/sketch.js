@@ -15,8 +15,9 @@
 
 let grid;
 let cellSize;
-const GRID_SIZE = 10;
+const GRID_SIZE = 30;
 let toggleStyle = "self";
+let isAutoPlayOn = false;
 
 function setup() {
   //make the canvas the largest square that you can...
@@ -48,6 +49,11 @@ function windowResized() {
 
 function draw() {
   background(220);
+
+  if (isAutoPlayOn && frameCount % 5 === 0) {
+    grid = updateGrid();
+  }
+
   displayGrid();
 }
 
@@ -69,39 +75,58 @@ function keyPressed() {
   }
 
   if (key === " ") {
-    updateGrid();
+    grid = updateGrid();
+  }
+
+  if (key === "a") {
+    isAutoPlayOn = !isAutoPlayOn;
   }
 }
 
 function updateGrid() {
+  //need a second array, so I don't mess with the grid while counting neighbours
   let nextTurn = generateEmptyGrid(GRID_SIZE, GRID_SIZE);
 
+  //look at every cell
   for (let y = 0; y < GRID_SIZE; y++) {
-    for (let x = 0; x < GRID_SIZE; x++){
-      let neighbours = -1;
+    for (let x = 0; x < GRID_SIZE; x++) {
+      let neighbours = 0;
+
+      //look at every cell in a 3x3 grid around the cell
       for (let i = -1; i <= 1; i++) {
         for (let j = -1; j <= 1; j++) {
-          if (x + j >= 0 && x + j < GRID_SIZE && y + i >= 0 && y + i < GRID_SIZE && (x !== 0 || y !== 0)) {
+          //avoid going off the edge of the grid
+          if (x+j >= 0 && x+j < GRID_SIZE && y+i >= 0 && y+i < GRID_SIZE) {
             neighbours += grid[y + i][x + j];
           }
         }
       }
 
-      if (grid[y][x] === 1) {
+      //don't count yourself in the neighbours
+      neighbours -= grid[y][x];
+
+
+      //apply the rules
+      if (grid[y][x] === 1) { //currently alive
         if (neighbours === 2 || neighbours === 3) {
           nextTurn[y][x] = 1;
         }
+        else {
+          nextTurn[y][x] = 0;
+        }
       }
 
-      if (grid[y][x] === 0) {
+      if (grid[y][x] === 0) { //currently dead
         if (neighbours === 3) {
           nextTurn[y][x] = 1;
+        }
+        else {
+          nextTurn[y][x] = 0;
         }
       }
     }
   }
-
-  grid = nextTurn;
+  return nextTurn;
 }
 
 
