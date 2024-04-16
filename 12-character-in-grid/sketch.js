@@ -1,23 +1,17 @@
-// 2D Grid
+// Character in 2D Grid
 // Dan Schellenberg
-// Apr 9, 2024
-
-// if you are hard-coding a level, I'd use something like this
-
-// let grid = [[1, 0, 0, 1],
-//             [0, 1, 0, 1],
-//             [1, 1, 0, 0],
-//             [1, 0, 1, 1],
-//             [0, 0, 0, 1],
-//             [0, 0, 1, 1],
-//             [0, 1, 0, 1],
-//             [0, 0, 0, 1]];
+// Apr 15, 2024
 
 let grid;
 let cellSize;
-let neighboorhood = true;
-
 const GRID_SIZE = 10;
+const PLAYER = 9;
+const OPEN_TILE = 0;
+const IMPASSIBLE = 1;
+let player = {
+  x: 0,
+  y: 0
+};
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -31,6 +25,8 @@ function setup() {
   else {
     cellSize = width/grid.length;
   }
+
+  grid[player.y][player.x] = PLAYER;
 }
 
 function windowResized() {
@@ -58,12 +54,32 @@ function keyPressed() {
     grid = generateEmptyGrid(GRID_SIZE, GRID_SIZE);
   }
   
-  if (key === "n") {
-    neighboorhood = true;
+  if (key === "w") {
+    movePlayer(player.x, player.y - 1);
   }
 
   if (key === "s") {
-    neighboorhood = false;
+    movePlayer(player.x, player.y + 1);
+  }
+
+  if (key === "a") {
+    movePlayer(player.x - 1, player.y);
+  }
+
+  if (key === "d") {
+    movePlayer(player.x + 1, player.y);
+  }
+}
+
+function movePlayer(x, y) {
+  if (x < GRID_SIZE && y < GRID_SIZE && 
+  x >= 0 && y >= 0 && grid[y][x] === OPEN_TILE) {
+    grid[player.y][player.x] = OPEN_TILE;
+
+    player.x = x;
+    player.y = y;
+
+    grid[player.y][player.x] = PLAYER;
   }
 }
 
@@ -74,33 +90,33 @@ function mousePressed() {
   // console.log(x, y);
 
   //don't fall off the edge of the grid...
-  for (let toggledCell of [[x, y], [x + 1, y], [x, y + 1], [x - 1, y], [x, y - 1]]) {
-    if (toggledCell[0] < GRID_SIZE && toggledCell[1] < GRID_SIZE
-        && toggledCell[0] >= 0 && toggledCell[1] >= 0 &&
-        (neighboorhood || toggledCell[0] === x && toggledCell[1] === y)) {
-      toggleCell(toggledCell[0], toggledCell[1]); 
-    }
-  }
+  toggleCell(x, y); 
 }
 
 function toggleCell(x, y) {
   //toggle the color of the cell
-  if (grid[y][x] === 0) {
-    grid[y][x] = 1;
-  }
-  else {
-    grid[y][x] = 0;
+  if (x < GRID_SIZE && y < GRID_SIZE && 
+    x >= 0 && y >= 0) {
+    if (grid[y][x] === OPEN_TILE) {
+      grid[y][x] = IMPASSIBLE;
+    }
+    else if (grid[y][x] === IMPASSIBLE) {
+      grid[y][x] = OPEN_TILE;
+    }
   }
 }
 
 function displayGrid() {
   for (let y = 0; y < grid.length; y++) {
     for (let x = 0; x < grid[y].length; x++) {
-      if (grid[y][x] === 1) {
+      if (grid[y][x] === OPEN_TILE) {
+        fill("white");
+      }
+      else if (grid[y][x] === IMPASSIBLE){
         fill("black");
       }
-      else {
-        fill("white");
+      else if (grid[y][x] === PLAYER) {
+        fill("red");
       }
       square(x * cellSize, y * cellSize, cellSize);
     }
@@ -129,7 +145,7 @@ function generateEmptyGrid(cols, rows) {
   for (let y = 0; y < rows; y++) {
     emptyArray.push([]);
     for (let x = 0; x < cols; x++) {
-      emptyArray[y].push(0);
+      emptyArray[y].push(OPEN_TILE);
     }
   }
   return emptyArray;
