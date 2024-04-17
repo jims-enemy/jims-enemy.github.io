@@ -13,6 +13,13 @@ let player = {
   y: 0
 };
 
+let backgroundMusic;
+let state = "start screen";
+
+function preload() {
+  backgroundMusic = loadSound("TownTheme.mp3");
+}
+
 function setup() {
   createCanvas(windowWidth, windowHeight);
 
@@ -41,8 +48,13 @@ function windowResized() {
 }
 
 function draw() {
-  background(220);
-  displayGrid();
+  if (state === "start screen") {
+    background("black");
+  }
+  else {
+    background(220);
+    displayGrid();
+  }
 }
 
 function keyPressed() {
@@ -68,6 +80,11 @@ function keyPressed() {
 
   if (key === "d") {
     movePlayer(player.x + 1, player.y);
+  }
+
+  if (key === " " && state === "start screen") {
+    state = "game";
+    backgroundMusic.loop();
   }
 }
 

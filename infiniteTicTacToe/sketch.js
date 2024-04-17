@@ -4,6 +4,7 @@ let timer;
 
 const COLUMNS = 3;
 const ROWS = 3;
+const ACCELERATION = 1.0813826568003;
 
 let turnX = true;
 
@@ -60,35 +61,56 @@ function drawPlayers(x1, y1, x2, y2) {
 
   for (let gridY = 0; gridY < COLUMNS; gridY++) {
     for (let gridX = 0; gridX < ROWS; gridX++) {
+      let squareX1 = gridWidth * gridX + x1;
+      let squareY1 = gridHeight * gridY + y1;
+      let squareX2 = gridWidth * (gridX + 1) + x1;
+      let squareY2 = gridHeight * (gridY + 1) + y1;
+      let thisSquare = currentGame[gridY][gridX];
+      let yDistance = squareY2 - squareY1;
+
       if (currentGame[gridY][gridX].player === "X") {
-        drawX(gridX, gridY);
+        drawX(squareX1, squareY1, squareX2, squareY2, thisSquare, yDistance);
+      }
+
+      else if (currentGame[gridY][gridX].player === "O") {
+        drawO(squareX1, squareY1, squareX2, squareY2, thisSquare, yDistance);
       }
     }
   }
 
-  function drawX(gridX, gridY) {
-    let squareX1 = gridWidth * gridX + x1;
-    let squareY1 = gridHeight * gridY + y1;
-    let squareX2 = gridWidth * (gridX + 1) + x1;
-    let squareY2 = gridHeight * (gridY + 1) + y1;
-    let thisSquare = currentGame[gridY][gridX];
+  function drawX(squareX1, squareY1, squareX2, squareY2, thisSquare, yDistance) {
+    let speedUp = ACCELERATION ** thisSquare.drawn/50;
+    let slowDown = Math.log(thisSquare.drawn - 50)/Math.log(ACCELERATION)/50;
 
     if (thisSquare.drawn <= 50) {
-      line(squareX1, squareY1, squareX1 + (squareX2 - squareX1) * thisSquare.drawn/50, squareY1 + (squareY2 - squareY1) * thisSquare.drawn/50);
+      line(squareX1, squareY1, squareX1 + (squareX2 - squareX1) * speedUp,
+        squareY1 + yDistance * speedUp);
     }
     else {
       line(squareX1, squareY1, squareX2, squareY2);
-      line(squareX2, squareY1,
-        squareX2 + (squareX1 - squareX2) * (thisSquare.drawn - 50)/50, squareY1 + (squareY2 - squareY1) * (thisSquare.drawn - 50)/50);
+      line(squareX2, squareY1, squareX2 + (squareX1 - squareX2) * slowDown,
+        squareY1 + yDistance * slowDown);
     }
 
-    if (timer >= drawSpeed/100 + thisSquare.lastUpdate &&
+    updateTimer(thisSquare);
+  }
+}
+
+function drawO(squareX1, squareY1, squareX2, squareY2, thisSquare, yDistance) {
+  noFill();
+  let xDistance = squareX2 - squareX1;
+  arc(squareX1 + xDistance/2, squareY1 + yDistance/2, xDistance, yDistance, 0, 2 * Math.PI/100 * 1.0471285480509**thisSquare.drawn);
+  updateTimer(thisSquare);
+
+}
+
+function updateTimer(thisSquare) {
+  if (timer >= drawSpeed/100 + thisSquare.lastUpdate &&
             thisSquare.drawn < 100) {
-      thisSquare.drawn += (timer - thisSquare.lastUpdate)/(drawSpeed/100);
-      if (thisSquare.drawn >= 100) {
-        thisSquare.drawn = 100;
-      }
-      thisSquare.lastUpdate = timer;
+    thisSquare.drawn += (timer - thisSquare.lastUpdate)/(drawSpeed/100);
+    if (thisSquare.drawn >= 100) {
+      thisSquare.drawn = 100;
     }
+    thisSquare.lastUpdate = timer;
   }
 }
