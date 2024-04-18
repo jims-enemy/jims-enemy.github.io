@@ -23,9 +23,11 @@ function mouseClicked() {
   if (currentGame[y][x] === 0) {
     if (turnX) {
       currentGame[y][x] = {player: "X", drawn: 0, lastUpdate: timer};
+      checkIf3(x, y);
     }
     else {
       currentGame[y][x] = {player: "O", drawn: 0, lastUpdate: timer};
+      checkIf3(x, y);
     }
 
     turnX = ! turnX;
@@ -38,7 +40,6 @@ function draw() {
 
   timer = millis();
   drawPlayers(0, 0, width, height);
-  //drawO();
 }
 
 function drawGame(x1, y1, x2, y2) {
@@ -67,20 +68,20 @@ function drawPlayers(x1, y1, x2, y2) {
       let squareY2 = gridHeight * (gridY + 1) + y1;
       let thisSquare = currentGame[gridY][gridX];
       let yDistance = squareY2 - squareY1;
+      let speedUp = ACCELERATION ** thisSquare.drawn/50;
+      let slowDown = Math.log(thisSquare.drawn - 50)/Math.log(ACCELERATION)/50;
 
       if (currentGame[gridY][gridX].player === "X") {
-        drawX(squareX1, squareY1, squareX2, squareY2, thisSquare, yDistance);
+        drawX(squareX1, squareY1, squareX2, squareY2, thisSquare, yDistance, speedUp, slowDown);
       }
 
       else if (currentGame[gridY][gridX].player === "O") {
-        drawO(squareX1, squareY1, squareX2, squareY2, thisSquare, yDistance);
+        drawO(squareX1, squareY1, squareX2, thisSquare, yDistance, speedUp, slowDown);
       }
     }
   }
 
-  function drawX(squareX1, squareY1, squareX2, squareY2, thisSquare, yDistance) {
-    let speedUp = ACCELERATION ** thisSquare.drawn/50;
-    let slowDown = Math.log(thisSquare.drawn - 50)/Math.log(ACCELERATION)/50;
+  function drawX(squareX1, squareY1, squareX2, squareY2, thisSquare, yDistance, speedUp, slowDown) {
 
     if (thisSquare.drawn <= 50) {
       line(squareX1, squareY1, squareX1 + (squareX2 - squareX1) * speedUp,
@@ -96,10 +97,17 @@ function drawPlayers(x1, y1, x2, y2) {
   }
 }
 
-function drawO(squareX1, squareY1, squareX2, squareY2, thisSquare, yDistance) {
+function drawO(squareX1, squareY1, squareX2, thisSquare, yDistance, speedUp, slowDown) {
   noFill();
   let xDistance = squareX2 - squareX1;
-  arc(squareX1 + xDistance/2, squareY1 + yDistance/2, xDistance, yDistance, 0, 2 * Math.PI/100 * 1.0471285480509**thisSquare.drawn);
+
+  if (thisSquare.drawn <= 50) {
+    arc(squareX1 + xDistance/2, squareY1 + yDistance/2, xDistance, yDistance, 0, PI * speedUp);
+  }
+  else {
+    arc(squareX1 + xDistance/2, squareY1 + yDistance/2, xDistance, yDistance, 0, PI + PI * slowDown);
+  }
+
   updateTimer(thisSquare);
 
 }
@@ -112,5 +120,24 @@ function updateTimer(thisSquare) {
       thisSquare.drawn = 100;
     }
     thisSquare.lastUpdate = timer;
+  }
+}
+
+function checkIf3(x, y) {
+  let rowsToCheck = [0];
+  let columnsToCheck = [0];
+
+  for (let updateArray of [[rowsToCheck, x], [columnsToCheck, y]]) {
+    for (let checkPosition of [0, 2]) {
+      if (updateArray[1] !== checkPosition) {
+        updateArray[0].push(checkPosition - 1);
+      }
+    }
+  }
+
+  for (let currentColumn of columnsToCheck) {
+    for (let currentRow of rowsToCheck) {
+      
+    }
   }
 }
