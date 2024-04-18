@@ -23,11 +23,11 @@ function mouseClicked() {
   if (currentGame[y][x] === 0) {
     if (turnX) {
       currentGame[y][x] = {player: "X", drawn: 0, lastUpdate: timer};
-      checkIf3(x, y);
+      checkIf3();
     }
     else {
       currentGame[y][x] = {player: "O", drawn: 0, lastUpdate: timer};
-      checkIf3(x, y);
+      checkIf3();
     }
 
     turnX = ! turnX;
@@ -123,21 +123,20 @@ function updateTimer(thisSquare) {
   }
 }
 
-function checkIf3(x, y) {
-  let rowsToCheck = [0];
-  let columnsToCheck = [0];
-
-  for (let updateArray of [[rowsToCheck, x], [columnsToCheck, y]]) {
-    for (let checkPosition of [0, 2]) {
-      if (updateArray[1] !== checkPosition) {
-        updateArray[0].push(checkPosition - 1);
-      }
-    }
-  }
-
-  for (let currentColumn of columnsToCheck) {
-    for (let currentRow of rowsToCheck) {
-      
+function checkIf3() {
+  for (let checkLine = 0; checkLine < 3; checkLine++) {
+    if (currentGame[checkLine][0].player === currentGame[checkLine][1].player &&
+    currentGame[checkLine][1].player === currentGame[checkLine][2].player &&
+    (currentGame[checkLine][2].player === "X" || currentGame[checkLine][2].player === "O") ||
+    currentGame[0][checkLine].player === currentGame[1][checkLine].player &&
+    currentGame[1][checkLine].player === currentGame[2][checkLine].player &&
+    (currentGame[2][checkLine].player === "X" || currentGame[2][checkLine].player === "O") ||
+    (currentGame[0][0].player === currentGame[1][1].player &&
+    currentGame[1][1].player === currentGame[2][2].player ||
+    currentGame[0][2].player === currentGame[1][1].player &&
+    currentGame[1][1].player === currentGame[2][0].player) &&
+    (currentGame[1][1].player === "X" || currentGame[1][1].player === "O")) {
+      console.log("win");
     }
   }
 }
