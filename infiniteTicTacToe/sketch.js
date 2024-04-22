@@ -1,12 +1,35 @@
-let currentGame = [[0, 0, 0,], [0, 0, 0,], [0, 0, 0]];
+let currentGame = {grid: [[0, 0, 0,], [0, 0, 0,], [0, 0, 0]], color: "white"};
 let drawSpeed = 1000;
 let timer;
+let megaBoard = [[], [], []];
+let turnX = true;
+let newColor = "white";
+
 
 const COLUMNS = 3;
 const ROWS = 3;
 const ACCELERATION = 1.0813826568003;
 
-let turnX = true;
+for (let currentColumn = 0; currentColumn < COLUMNS; currentColumn++) {
+  for (let currentRow = 0; currentRow < ROWS; currentRow++) {
+    
+    if (currentRow === 0) {
+      newColor = 255000000;
+    }
+
+    else if (currentRow === 1) {
+      newColor = 255000;
+    }
+
+    else {
+      newColor = 255;
+    }
+
+
+    megaBoard[currentColumn][currentRow] = {grid: [[0, 0, 0,], [0, 0, 0,], [0, 0, 0]], color: newColor};
+  }
+}
+
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -17,41 +40,53 @@ function windowResized() {
 }
 
 function mouseClicked() {
-  let x = Math.floor(mouseX/(width/ROWS));
-  let y = Math.floor(mouseY/(height/COLUMNS));
+  let x = Math.floor(mouseX/(width/(ROWS*2))) - ROWS;
+  let y = Math.floor(mouseY/(height/(COLUMNS*2))) - COLUMNS;
 
-  if (currentGame[y][x] === 0) {
-    if (turnX) {
-      currentGame[y][x] = {player: "X", drawn: 0, lastUpdate: timer};
-      checkIf3();
-    }
-    else {
-      currentGame[y][x] = {player: "O", drawn: 0, lastUpdate: timer};
-      checkIf3();
-    }
+  if (x >= 0 && y >= 0) {
+    if (currentGame.grid[y][x] === 0) {
+      if (turnX) {
+        currentGame.grid[y][x] = {player: "X", drawn: 0, lastUpdate: timer};
+        checkIf3();
+      }
+      else {
+        currentGame.grid[y][x] = {player: "O", drawn: 0, lastUpdate: timer};
+        checkIf3();
+      }
 
-    turnX = ! turnX;
+      turnX = ! turnX;
+    }
   }
 }
 
 function draw() {
   background("black");
-  drawGame(0, 0, width, height);
+  drawBoards();
 
   timer = millis();
-  drawPlayers(0, 0, width, height);
+  drawPlayers(width/2, height/2, width, height);
+}
+
+function drawBoards(){
+  for (let currentColumn = 0; currentColumn < COLUMNS; currentColumn++) {
+    for (let currentRow = 0; currentRow < ROWS; currentRow++) {
+      stroke(megaBoard[currentColumn][currentRow].color);
+      drawGame(0 + width/6 * currentRow, 0 + height/6 * currentColumn, width/6 * (currentRow + 1), height/6 * (currentColumn + 1));
+    }
+  }
+
+  stroke(currentGame.color);
+  drawGame(width/2, height/2, width, height);
 }
 
 function drawGame(x1, y1, x2, y2) {
-  stroke("white");
-
   // Draws the columns.
-  for(let currentColumn = 0; currentColumn < COLUMNS; currentColumn++) {
+  for (let currentColumn = 0; currentColumn <= COLUMNS; currentColumn++) {
     line((x2 - x1)/COLUMNS * currentColumn + x1, y1, (x2 - x1)/COLUMNS * currentColumn + x1, y2);
   }
 
   // Draws the rows.
-  for(let currentRow = 0; currentRow < ROWS; currentRow++) {
+  for (let currentRow = 0; currentRow <= ROWS; currentRow++) {
     line(x1,(y2 - y1)/ROWS * currentRow + y1, x2, (y2 - y1)/ROWS * currentRow + y1);
   }
 }
@@ -66,16 +101,16 @@ function drawPlayers(x1, y1, x2, y2) {
       let squareY1 = gridHeight * gridY + y1;
       let squareX2 = gridWidth * (gridX + 1) + x1;
       let squareY2 = gridHeight * (gridY + 1) + y1;
-      let thisSquare = currentGame[gridY][gridX];
+      let thisSquare = currentGame.grid[gridY][gridX];
       let yDistance = squareY2 - squareY1;
       let speedUp = ACCELERATION ** thisSquare.drawn/50;
       let slowDown = Math.log(thisSquare.drawn - 50)/Math.log(ACCELERATION)/50;
 
-      if (currentGame[gridY][gridX].player === "X") {
+      if (currentGame.grid[gridY][gridX].player === "X") {
         drawX(squareX1, squareY1, squareX2, squareY2, thisSquare, yDistance, speedUp, slowDown);
       }
 
-      else if (currentGame[gridY][gridX].player === "O") {
+      else if (currentGame.grid[gridY][gridX].player === "O") {
         drawO(squareX1, squareY1, squareX2, thisSquare, yDistance, speedUp, slowDown);
       }
     }
@@ -125,17 +160,17 @@ function updateTimer(thisSquare) {
 
 function checkIf3() {
   for (let checkLine = 0; checkLine < 3; checkLine++) {
-    if (currentGame[checkLine][0].player === currentGame[checkLine][1].player &&
-    currentGame[checkLine][1].player === currentGame[checkLine][2].player &&
-    (currentGame[checkLine][2].player === "X" || currentGame[checkLine][2].player === "O") ||
-    currentGame[0][checkLine].player === currentGame[1][checkLine].player &&
-    currentGame[1][checkLine].player === currentGame[2][checkLine].player &&
-    (currentGame[2][checkLine].player === "X" || currentGame[2][checkLine].player === "O") ||
-    (currentGame[0][0].player === currentGame[1][1].player &&
-    currentGame[1][1].player === currentGame[2][2].player ||
-    currentGame[0][2].player === currentGame[1][1].player &&
-    currentGame[1][1].player === currentGame[2][0].player) &&
-    (currentGame[1][1].player === "X" || currentGame[1][1].player === "O")) {
+    if (currentGame.grid[checkLine][0].player === currentGame.grid[checkLine][1].player &&
+    currentGame.grid[checkLine][1].player === currentGame.grid[checkLine][2].player &&
+    (currentGame.grid[checkLine][2].player === "X" || currentGame.grid[checkLine][2].player === "O") ||
+    currentGame.grid[0][checkLine].player === currentGame.grid[1][checkLine].player &&
+    currentGame.grid[1][checkLine].player === currentGame.grid[2][checkLine].player &&
+    (currentGame.grid[2][checkLine].player === "X" || currentGame.grid[2][checkLine].player === "O") ||
+    (currentGame.grid[0][0].player === currentGame.grid[1][1].player &&
+    currentGame.grid[1][1].player === currentGame.grid[2][2].player ||
+    currentGame.grid[0][2].player === currentGame.grid[1][1].player &&
+    currentGame.grid[1][1].player === currentGame.grid[2][0].player) &&
+    (currentGame.grid[1][1].player === "X" || currentGame.grid[1][1].player === "O")) {
       console.log("win");
     }
   }
