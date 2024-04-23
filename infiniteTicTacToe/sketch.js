@@ -1,10 +1,11 @@
 let currentGame = {grid: [[0, 0, 0,], [0, 0, 0,], [0, 0, 0]], R: 255, G: 255, B: 255};
-let drawSpeed = 10000;
+let drawSpeed = 1000;
 let timer;
 let megaBoard = [[], [], []];
-let turnX = true;
+let currentPlayer = "Current turn: X";
 let pickSquare = true;
 let winnerFound = false;
+let DEBUGFONTSIZE = 1;
 
 const COLUMNS = 3;
 const ROWS = 3;
@@ -68,16 +69,16 @@ function mouseClicked() {
 
       if (x >= 0 && y >= 0) {
         if (currentGame.grid[y][x] === 0) {
-          if (turnX) {
+          if (currentPlayer === "Current turn: X") {
             currentGame.grid[y][x] = {player: "X", drawn: 0, lastUpdate: timer};
             checkIf3();
+            currentPlayer = "Current turn: O";
           }
           else {
             currentGame.grid[y][x] = {player: "O", drawn: 0, lastUpdate: timer};
             checkIf3();
+            currentPlayer = "Current turn: X";
           }
-
-          turnX = ! turnX;
 
           if (megaBoard[y][x].player === 0) {
             currentGame = megaBoard[y][x];
@@ -104,9 +105,19 @@ function mouseClicked() {
 
 function draw() {
   background("black");
-  drawBoards();
+  // if (height < width) {
+  //   textSize(104/667 * height);
+  // }
+  // else {
+  //   textSize(104/1280 * width);
+  // }
+
+  textSize(DEBUGFONTSIZE);
+
+  text(DEBUGFONTSIZE, 0, height);
 
   timer = millis();
+  drawBoards();
 }
 
 function drawBoards(){
@@ -225,7 +236,7 @@ function checkIf3() {
     currentGame.grid[0][2].player === currentGame.grid[1][1].player &&
     currentGame.grid[1][1].player === currentGame.grid[2][0].player) &&
     (currentGame.grid[1][1].player === "X" || currentGame.grid[1][1].player === "O")) {
-      if (turnX) {
+      if (currentPlayer === "Current turn: X") {
         currentGame.player = "X";
         currentGame.drawn = 0;
         currentGame.lastUpdate = timer;
@@ -252,5 +263,14 @@ function checkIf3() {
         }
       }
     }
+  }
+}
+
+function keyPressed() {
+  if (keyCode === UP_ARROW) {
+    DEBUGFONTSIZE++;
+  }
+  else if (keyCode === DOWN_ARROW) {
+    DEBUGFONTSIZE--;
   }
 }
