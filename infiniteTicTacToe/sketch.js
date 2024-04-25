@@ -1,60 +1,22 @@
-let currentGame = {grid: [[0, 0, 0,], [0, 0, 0,], [0, 0, 0]], R: 255, G: 255, B: 255};
+let currentGame;
 let drawSpeed = 1000;
 let timer;
-let megaBoard = [[], [], []];
+let megaBoard;
 let currentPlayer = "Current turn: X";
-let pickSquare = true;
-let winnerFound = false;
-let DEBUGFONTSIZE = 1;
+let pickSquare;
+let winnerFound;
+let xWins = 0;
+let oWins = -1;
 
 const COLUMNS = 3;
 const ROWS = 3;
 const ACCELERATION = 1.0813826568003;
 
-for (let currentColumn = 0; currentColumn < COLUMNS; currentColumn++) {
-  for (let currentRow = 0; currentRow < ROWS; currentRow++) {
-    let thisR = -127.5;
-    let thisG = -127.5;
-    let thisB = -127.5;
-    
-    if (currentRow === 0) {
-      thisR = 510;
-
-      for (let cycle = 0; cycle <= currentColumn; cycle++) {
-        thisR = thisR/2;
-        thisG += thisR/2;
-        thisB += thisR/2;
-      }
-    }
-
-    else if (currentRow === 1) {
-      thisG = 510;
-
-      for (let cycle = 0; cycle <= currentColumn; cycle++) {
-        thisG = thisG/2;
-        thisR += thisG/2;
-        thisB += thisG/2;
-      }
-    }
-
-    else {
-      thisB = 510;
-
-      for (let cycle = 0; cycle <= currentColumn; cycle++) {
-        thisB = thisB/2;
-        thisR += thisB/2;
-        thisG += thisB/2;
-      }
-    }
-
-    megaBoard[currentColumn][currentRow] = {grid: [[0, 0, 0,], [0, 0, 0,], [0, 0, 0]], R: thisR,
-      G: thisG, B: thisB, player: 0};
-  }
-}
-
-
 function setup() {
   createCanvas(windowWidth, windowHeight);
+  noFill();
+  resetGame();
+
 }
 
 function windowResized() {
@@ -105,16 +67,7 @@ function mouseClicked() {
 
 function draw() {
   background("black");
-  // if (height < width) {
-  //   textSize(104/667 * height);
-  // }
-  // else {
-  //   textSize(104/1280 * width);
-  // }
-
-  textSize(DEBUGFONTSIZE);
-
-  text(DEBUGFONTSIZE, 0, height);
+  drawText();
 
   timer = millis();
   drawBoards();
@@ -177,25 +130,25 @@ function drawPlayers(x1, y1, x2, y2, game) {
       }
     }
   }
-
-  function drawX(squareX1, squareY1, squareX2, squareY2, thisSquare, yDistance, speedUp, slowDown) {
-
-    if (thisSquare.drawn <= 50) {
-      line(squareX1, squareY1, squareX1 + (squareX2 - squareX1) * speedUp,
-        squareY1 + yDistance * speedUp);
-    }
-    else {
-      line(squareX1, squareY1, squareX2, squareY2);
-      line(squareX2, squareY1, squareX2 + (squareX1 - squareX2) * slowDown,
-        squareY1 + yDistance * slowDown);
-    }
-
-    updateTimer(thisSquare);
-  }
 }
 
+function drawX(squareX1, squareY1, squareX2, squareY2, thisSquare, yDistance, speedUp, slowDown) {
+
+  if (thisSquare.drawn <= 50) {
+    line(squareX1, squareY1, squareX1 + (squareX2 - squareX1) * speedUp,
+      squareY1 + yDistance * speedUp);
+  }
+  else {
+    line(squareX1, squareY1, squareX2, squareY2);
+    line(squareX2, squareY1, squareX2 + (squareX1 - squareX2) * slowDown,
+      squareY1 + yDistance * slowDown);
+  }
+
+  updateTimer(thisSquare);
+}
+
+
 function drawO(squareX1, squareY1, squareX2, thisSquare, yDistance, speedUp, slowDown) {
-  noFill();
   let xDistance = squareX2 - squareX1;
 
   if (thisSquare.drawn <= 50) {
@@ -216,7 +169,7 @@ function updateTimer(thisSquare) {
     if (thisSquare.drawn >= 100) {
       thisSquare.drawn = 100;
       if (winnerFound) {
-        noLoop();
+        resetGame();
       }
     }
     thisSquare.lastUpdate = timer;
@@ -266,11 +219,74 @@ function checkIf3() {
   }
 }
 
-function keyPressed() {
-  if (keyCode === UP_ARROW) {
-    DEBUGFONTSIZE++;
+function drawText() {
+  stroke("white");
+  textAlign(LEFT, BASELINE);
+
+  if (480/667 * height < 81/1000 * width) {
+    textSize(480/667 * height);
   }
-  else if (keyCode === DOWN_ARROW) {
-    DEBUGFONTSIZE--;
+  else {
+    textSize(81/1000 * width);
   }
+
+  text(currentPlayer, 0, height);
+
+  // text(`X wins: 000
+  // O wins: 000`, );
+}
+
+function resetGame() {
+  if (currentPlayer === "Current turn: X") {
+    oWins++;
+  }
+  else {
+    xWins++;
+  }
+  currentGame = {grid: [[0, 0, 0,], [0, 0, 0,], [0, 0, 0]], R: 255, G: 255, B: 255};
+  megaBoard = [[], [], []];
+
+  for (let currentColumn = 0; currentColumn < COLUMNS; currentColumn++) {
+    for (let currentRow = 0; currentRow < ROWS; currentRow++) {
+      let thisR = -127.5;
+      let thisG = -127.5;
+      let thisB = -127.5;
+      
+      if (currentRow === 0) {
+        thisR = 510;
+  
+        for (let cycle = 0; cycle <= currentColumn; cycle++) {
+          thisR = thisR/2;
+          thisG += thisR/2;
+          thisB += thisR/2;
+        }
+      }
+  
+      else if (currentRow === 1) {
+        thisG = 510;
+  
+        for (let cycle = 0; cycle <= currentColumn; cycle++) {
+          thisG = thisG/2;
+          thisR += thisG/2;
+          thisB += thisG/2;
+        }
+      }
+  
+      else {
+        thisB = 510;
+  
+        for (let cycle = 0; cycle <= currentColumn; cycle++) {
+          thisB = thisB/2;
+          thisR += thisB/2;
+          thisG += thisB/2;
+        }
+      }
+  
+      megaBoard[currentColumn][currentRow] = {grid: [[0, 0, 0,], [0, 0, 0,], [0, 0, 0]], R: thisR,
+        G: thisG, B: thisB, player: 0};
+    }
+  }
+
+  pickSquare = true;
+  winnerFound = false;
 }
