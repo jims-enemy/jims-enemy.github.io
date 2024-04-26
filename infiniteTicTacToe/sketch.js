@@ -221,19 +221,17 @@ function checkIf3() {
 
 function drawText() {
   stroke("white");
-  textAlign(LEFT, BASELINE);
+  textAlign(LEFT, BOTTOM);
 
-  if (480/667 * height < 81/1000 * width) {
-    textSize(480/667 * height);
+  if (height/2 - 4 < width/(768750011920929/62500000000000)) {
+    textSize(height/2 - 4);
   }
   else {
-    textSize(81/1000 * width);
+    textSize(width / (768750011920929/62500000000000));
   }
 
-  text(currentPlayer, 0, height);
+  text(currentPlayer, 0, height); //94 667
 
-  // text(`X wins: 000
-  // O wins: 000`, );
 }
 
 function resetGame() {
