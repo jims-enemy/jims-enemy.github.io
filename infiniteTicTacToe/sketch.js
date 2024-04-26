@@ -6,7 +6,8 @@ let currentPlayer = "Current turn: X";
 let pickSquare;
 let winnerFound;
 let xWins = 0;
-let oWins = -1;
+let oWins = 0;
+let tieDelay;
 
 const COLUMNS = 3;
 const ROWS = 3;
@@ -15,7 +16,7 @@ const ACCELERATION = 1.0813826568003;
 function setup() {
   createCanvas(windowWidth, windowHeight);
   noFill();
-  resetGame();
+  resetGame(false);
 
 }
 
@@ -42,10 +43,10 @@ function mouseClicked() {
             currentPlayer = "Current turn: X";
           }
 
-          if (megaBoard[y][x].player === 0) {
+          if (megaBoard[y][x].player === 0 && megaBoard[y][x].grid.flatMap(subarray => subarray).some(element => element === 0)) {
             currentGame = megaBoard[y][x];
           }
-          else if (currentGame.player !== 0) {
+          else if (currentGame.player !== 0 || ! currentGame.grid.flatMap(subarray => subarray).some(element => element === 0)) {
             pickSquare = true;
             currentGame = {grid: [[0, 0, 0,], [0, 0, 0,], [0, 0, 0]], R: 255, G: 255, B: 255};
           }
@@ -57,7 +58,7 @@ function mouseClicked() {
       let x = Math.floor(mouseX/(width/(COLUMNS*2)));
       let y = Math.floor(mouseY/(height/(ROWS*2)));
 
-      if (megaBoard[y][x].player === 0) {
+      if (megaBoard[y][x].player === 0 && megaBoard[y][x].grid.flatMap(subarray => subarray).some(element => element === 0)) {
         currentGame = megaBoard[y][x];
         pickSquare = false;
       }
@@ -71,6 +72,7 @@ function draw() {
 
   timer = millis();
   drawBoards();
+  checkForTie();
 }
 
 function drawBoards(){
@@ -168,8 +170,8 @@ function updateTimer(thisSquare) {
     thisSquare.drawn += (timer - thisSquare.lastUpdate)/(drawSpeed/100);
     if (thisSquare.drawn >= 100) {
       thisSquare.drawn = 100;
-      if (winnerFound) {
-        resetGame();
+      if (winnerFound > 0 && timer > winnerFound + drawSpeed * 2) {
+        resetGame(true);
       }
     }
     thisSquare.lastUpdate = timer;
@@ -212,7 +214,7 @@ function checkIf3() {
         megaBoard[0][2].player === megaBoard[1][1].player &&
         megaBoard[1][1].player === megaBoard[2][0].player) &&
         (megaBoard[1][1].player === "X" || megaBoard[1][1].player === "O")) {
-          winnerFound = true;
+          winnerFound = timer;
         }
       }
     }
@@ -220,6 +222,15 @@ function checkIf3() {
 }
 
 function drawText() {
+  let biggerWinner;
+
+  if (String(xWins).length > String(oWins).length) {
+    biggerWinner = String(xWins).length;
+  }
+  else {
+    biggerWinner = String(oWins).length;
+  }
+
   stroke("white");
   textAlign(LEFT, BOTTOM);
 
@@ -230,16 +241,31 @@ function drawText() {
     textSize(width / (768750011920929/62500000000000));
   }
 
-  text(currentPlayer, 0, height); //94 667
+  text(currentPlayer, 0, height);
+
+  if (height/4 - 4 < width / (4 * (3.4000000953674312 + 0.5000000000000004 * biggerWinner))) {
+    textSize(height/4 - 4);
+  }
+  else {
+    textSize(width / (4 * (3.4000000953674312 + 0.5000000000000004 * biggerWinner)));
+  }
+
+  text("X wins: " + xWins, width/2, height/2);
+
+  textAlign(RIGHT, TOP);
+
+  text("O wins: " + oWins, width, 0);
 
 }
 
-function resetGame() {
-  if (currentPlayer === "Current turn: X") {
-    oWins++;
-  }
-  else {
-    xWins++;
+function resetGame(updateWins) {
+  if (updateWins) {
+    if (currentPlayer === "Current turn: X") {
+      oWins++;
+    }
+    else {
+      xWins++;
+    }
   }
   currentGame = {grid: [[0, 0, 0,], [0, 0, 0,], [0, 0, 0]], R: 255, G: 255, B: 255};
   megaBoard = [[], [], []];
@@ -286,5 +312,26 @@ function resetGame() {
   }
 
   pickSquare = true;
-  winnerFound = false;
+  winnerFound = 0;
+}
+
+function checkForTie() {
+
+  for (let gameY of megaBoard) {
+    for (let gameX of gameY) {
+      if (gameX.grid.flatMap(subarray => subarray).some(element => element === 0) && gameX.player === 0) {
+        return;
+      }
+    }
+  }
+
+  if (tieDelay > 0) {
+    if (timer > tieDelay + drawSpeed * 2) {
+      resetGame(false);
+      tieDelay = 0;
+    }
+  }
+  else {
+    tieDelay = timer;
+  }
 }
