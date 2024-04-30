@@ -12,6 +12,7 @@
 - [Interactive Scene](the_answer)
 - [Arrays and Object Notation Assignment](tetrisVSbutsp)
 - [2D Arrays Assignment](ultimateTicTacToe)
+- [Walker OOP](14-walker)
 
 # Capstone Coding Project
 - [insert name here](the_FINAL_answer)

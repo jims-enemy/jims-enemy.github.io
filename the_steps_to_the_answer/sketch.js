@@ -1,18 +1,20 @@
-const OpenAI = require("openai");
+let socket;
 
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-});
-
-function doStuff() {
-    return openai.chat.completions.create({
-        messages: [{ role: "user", content: "Say this is a test" }],
-        model: "gpt-3.5-turbo",
-    }).then(chatCompletion => {
-        console.log(chatCompletion);
-    }).catch(err => {
-        console.error(err);
-    });
+function setup() {
+  createCanvas(400, 400);
+  
+  // Connect to the server
+  socket = io.connect("http://localhost:5000");
+  
+  // Send a message to the server
+  socket.emit("message", "Hello from p5.js!");
+  
+  // Listen for responses from the server
+  socket.on("response", function(data) {
+    console.log(data);
+  });
 }
 
-doStuff();
+function draw() {
+  background(220);
+}
