@@ -227,6 +227,41 @@ function mouseClicked() {
   }
 }
 
+/** Resets the game if someone has won or if there are no available moves, after a delay. */
+function checkForEnd() {
+
+  // After a delay of double the drawSpeed, if someone has won, reset the game and increment the win counter.
+  if (winnerFound > 0 && timer > winnerFound + drawSpeed * 2) {
+    resetGame(true);
+  }
+
+  // Loops through every single game.
+  for (let gameY of megaBoard) {
+    for (let gameX of gameY) {
+
+      // If there are any empty spaces found, end this function.
+      if (gameX.grid.flatMap(subarray => subarray).some(element => element === 0) && gameX.player === 0) {
+        return;
+      }
+    }
+  }
+
+  // Checks if there it has already been declared a tie.
+  if (tieDelay > 0) {
+
+    // If it has, and if there has been a delay of double the drawSpeed, reset the game without incrementing the win counter.
+    if (timer > tieDelay + drawSpeed * 2) {
+      resetGame(false);
+      tieDelay = 0;
+    }
+  }
+
+  // If this is the first time it detected this tie, set the time found to tieDelay.
+  else {
+    tieDelay = timer;
+  }
+}
+
 function draw() {
   background("black");
   drawText();
@@ -285,11 +320,13 @@ function updateTimer(thisSquare) {
  * @param {number} slowDown - A value that increases logarithmically the more percentage drawn is. */
 function drawX(squareX1, squareY1, squareX2, squareY2, thisSquare, yDistance, speedUp, slowDown) {
 
-  // When drawing the first line, speed up e
+  // When drawing the first line, speed up exponentially.
   if (thisSquare.drawn <= 50) {
     line(squareX1, squareY1, squareX1 + (squareX2 - squareX1) * speedUp,
       squareY1 + yDistance * speedUp);
   }
+
+  // The second line only speeds up logarithmically.
   else {
     line(squareX1, squareY1, squareX2, squareY2);
     line(squareX2, squareY1, squareX2 + (squareX1 - squareX2) * slowDown,
@@ -299,12 +336,48 @@ function drawX(squareX1, squareY1, squareX2, squareY2, thisSquare, yDistance, sp
   updateTimer(thisSquare);
 }
 
+/** Draws an O.
+ * @param {number} squareX1 - The first x-coordinate of the square.
+ * @param {number} squareY1 - The first y-coordinate of the square.
+ * @param {number} squareX2 - The second x-coordinate of the square.
+ * @param {number} squareY2 - The second y-coordinate of the square.
+ * @param {object} thisSquare - The square that the O is being drawn in.
+ * @param {number} yDistance - squareY2 minus squareY1.
+ * @param {number} speedUp - A value that increases exponentially the more percentage drawn is.
+ * @param {number} slowDown - A value that increases logarithmically the more percentage drawn is. */
+function drawO(squareX1, squareY1, squareX2, thisSquare, yDistance, speedUp, slowDown) {
+
+  let xDistance = squareX2 - squareX1;
+
+  // Draws the first half of the circle, speeding up exponentially.
+  if (thisSquare.drawn <= 50) {
+    arc(squareX1 + xDistance/2, squareY1 + yDistance/2, xDistance, yDistance, 0, PI * speedUp);
+  }
+
+  // Draws the other half, slowing down exponentially.
+  else {
+    arc(squareX1 + xDistance/2, squareY1 + yDistance/2, xDistance, yDistance, 0, PI + PI * slowDown);
+  }
+
+  updateTimer(thisSquare);
+}
+
+/** Draws all the marks on a game.
+ * @param {number} x1 - The first x-coordinate of the grid.
+ * @param {number} y1 - The first y-coordinate of the grid.
+ * @param {number} x2 - The second x-coordinate of the grid.
+ * @param {number} y2 - The second y-coordinate of the grid.
+ * @param {Array} game - The 2D array representing the game to draw. */
 function drawPlayers(x1, y1, x2, y2, game) {
+
   let gridWidth = (x2 - x1)/COLUMNS;
   let gridHeight = (y2 - y1)/ROWS;
 
+  // Loops through every square on the board.
   for (let gridY = 0; gridY < COLUMNS; gridY++) {
     for (let gridX = 0; gridX < ROWS; gridX++) {
+
+      // Sets values used for both drawing X and O.
       let squareX1 = gridWidth * gridX + x1;
       let squareY1 = gridHeight * gridY + y1;
       let squareX2 = gridWidth * (gridX + 1) + x1;
@@ -314,16 +387,19 @@ function drawPlayers(x1, y1, x2, y2, game) {
       let speedUp = ACCELERATION ** thisSquare.drawn/50;
       let slowDown = Math.log(thisSquare.drawn - 50)/Math.log(ACCELERATION)/50;
       
+      // If the square is X, draw an X.
       if (game[gridY][gridX].player === "X") {
         drawX(squareX1, squareY1, squareX2, squareY2, thisSquare, yDistance, speedUp, slowDown);
       }
 
+      // Otherwise, if the square is O, draw an O. 
       else if (game[gridY][gridX].player === "O") {
         drawO(squareX1, squareY1, squareX2, thisSquare, yDistance, speedUp, slowDown);
       }
     }
   }
 }
+
 /** Draws every game. */
 function drawBoards(){
 
@@ -334,6 +410,7 @@ function drawBoards(){
       // Sets the color to the board's RGB values.
       stroke(megaBoard[currentColumn][currentRow].R, megaBoard[currentColumn][currentRow].G, megaBoard[currentColumn][currentRow].B);
 
+      // Draws the current smaller board.
       drawGame(0 + width/6 * currentRow, 0 + height/6 * currentColumn, width/6 * (currentRow + 1), height/6 * (currentColumn + 1));
       drawPlayers(width/6 * currentRow, height/6 * currentColumn,
         width/6 * (currentRow + 1), height/6 * (currentColumn + 1),
@@ -341,93 +418,67 @@ function drawBoards(){
     }
   }
 
+  // Sets the color to the current game's RGB values.
   stroke(currentGame.R, currentGame.G, currentGame.B);
+
+  // Draws the current active board.
   drawGame(width/2, height/2, width, height);
   drawPlayers(width/2, height/2, width, height, currentGame.grid);
 
+  // Draws the white board made out of the smaller boards.
   stroke("white");
   drawGame(0, 0, width/2, height/2);
   drawPlayers(0, 0, width/2, height/2, megaBoard);
 }
 
-
-
-
-
-
-function drawO(squareX1, squareY1, squareX2, thisSquare, yDistance, speedUp, slowDown) {
-  let xDistance = squareX2 - squareX1;
-
-  if (thisSquare.drawn <= 50) {
-    arc(squareX1 + xDistance/2, squareY1 + yDistance/2, xDistance, yDistance, 0, PI * speedUp);
-  }
-  else {
-    arc(squareX1 + xDistance/2, squareY1 + yDistance/2, xDistance, yDistance, 0, PI + PI * slowDown);
-  }
-
-  updateTimer(thisSquare);
-
-}
-
-
+/** Draws all the text. */
 function drawText() {
   let biggerWinner;
 
+  // If the player who has more digits in their win counter is X, set biggerWinner to X's length.
   if (String(xWins).length > String(oWins).length) {
     biggerWinner = String(xWins).length;
   }
+  
+  // Otherwise, set biggerWinner to O's length.
   else {
     biggerWinner = String(oWins).length;
   }
 
+  // Sets the current player text color to be white and aligns it to be a little above the bottom left.
   stroke("white");
   textAlign(LEFT, BOTTOM);
 
+  // If the biggest the current player text can be drawn without overlap is determined by the height, draw it as tall as half the height.
   if (height/2 - 4 < width/(768750011920929/62500000000000)) {
     textSize(height/2 - 4);
   }
+
+  // Otherwise, draw it's width as the same as half of the canvas width.
   else {
     textSize(width / (768750011920929/62500000000000));
   }
 
+  // Display the current player.
   text(currentPlayer, 0, height);
 
+  // If the biggest the win counters can be drawn without overlapping with anything is determined by the height, draw it as tall as quarter of the height.
   if (height/4 - 4 < width / (4 * (3.4000000953674312 + 0.5000000000000004 * biggerWinner))) {
     textSize(height/4 - 4);
   }
+
+  // Otherwise, draw it's width as the same as quarter of the canvas width.
   else {
     textSize(width / (4 * (3.4000000953674312 + 0.5000000000000004 * biggerWinner)));
   }
 
+  // Draws the X win counter at the bottom left of the upper right empty square.
   text("X wins: " + xWins, width/2, height/2);
 
+  // Aligns the O win counter text with a little below the top right corner.
   textAlign(RIGHT, TOP);
 
+  // Draws the O win counter at the upper right corner of the canvas.
   text("O wins: " + oWins, width, 0);
 
-}
-
-
-function checkForEnd() {
-  if (winnerFound > 0 && timer > winnerFound + drawSpeed * 2) {
-    resetGame(true);
-  }
-
-  for (let gameY of megaBoard) {
-    for (let gameX of gameY) {
-      if (gameX.grid.flatMap(subarray => subarray).some(element => element === 0) && gameX.player === 0) {
-        return;
-      }
-    }
-  }
-
-  if (tieDelay > 0) {
-    if (timer > tieDelay + drawSpeed * 2) {
-      resetGame(false);
-      tieDelay = 0;
-    }
-  }
-  else {
-    tieDelay = timer;
-  }
 }
