@@ -15,4 +15,4 @@
 
 # Capstone Coding Project
 - [insert name here](the_FINAL_answer)
-- [Game-Dev Buddy in Python](the_steps_to_the_answer)
+- [Game-Dev Buddy](the_steps_to_the_answer)

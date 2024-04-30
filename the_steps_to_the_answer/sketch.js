@@ -1,15 +1,18 @@
-// Project Title
-// Your Name
-// Date
-//
-// Extra for Experts:
-// - describe what you did to take this project "above and beyond"
+const OpenAI = require("openai");
 
+const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+});
 
-function setup() {
-  createCanvas(windowWidth, windowHeight);
+function doStuff() {
+    return openai.chat.completions.create({
+        messages: [{ role: "user", content: "Say this is a test" }],
+        model: "gpt-3.5-turbo",
+    }).then(chatCompletion => {
+        console.log(chatCompletion);
+    }).catch(err => {
+        console.error(err);
+    });
 }
 
-function draw() {
-  background(220);
-}
+doStuff();
