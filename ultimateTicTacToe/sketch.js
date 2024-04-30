@@ -272,16 +272,6 @@ function checkForEnd() {
   }
 }
 
-function draw() {
-  background("black");
-  drawText();
-
-  timer = millis();
-  drawBoards();
-  checkForEnd();
-
-}
-
 /** Draws a grid.
  * @param {number} x1 - The first x-coordinate of the grid.
  * @param {number} y1 - The first y-coordinate of the grid.
@@ -490,5 +480,15 @@ function drawText() {
 
   // Draws the O win counter at the upper right corner of the canvas.
   text("O wins: " + oWins, width, 0);
+
+}
+
+function draw() {
+  background("black");
+  drawText();
+
+  timer = millis();
+  drawBoards();
+  checkForEnd();
 
 }
