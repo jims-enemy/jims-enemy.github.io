@@ -1,3 +1,7 @@
+// Unsolved mystery: the X likes to briefly go the wrong way when drawing the second line.
+// However, the visibility of this defiant action depends on the monitor's refresh rate and is inconsistent.
+// The higher the refresh rate, the less visible the bug is generally.
+
 // Extras for experts:
 //  - I have included @param and @returns in my doc strings where applicable,
 //  - I have used string() to convert numbers to strings to check how many digits are used with .length.
