@@ -1,4 +1,3 @@
-// Despite the name, I actually downgraded to the creation of the game "Ultimate Tic Tac Toe" instead of my weird version of it where it is infinite.
 // Extras for experts:
 //  - I have included @param and @returns in my doc strings where applicable,
 //  - I have used string() to convert numbers to strings to check how many digits are used with .length.
