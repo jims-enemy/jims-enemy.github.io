@@ -21,7 +21,7 @@ function setup() {
   fill("white");
 
   // eslint-disable-next-line no-undef
-  //textWrap(CHAR); // This is defined and works. ESLint just misflags it.
+  textWrap(CHAR); // This is defined and works. ESLint just misflags it.
 }
 
 function windowResized() {
@@ -39,7 +39,7 @@ function draw() {
 function keyPressed() {
   if (keyCode === ENTER && userInput.elt === document.activeElement && ! keyIsDown(SHIFT)) {
     socket.send(userInput.value());
-    userText += userInput.value() + "\n";
+    userText += userInput.value();
     userInput.value("");
     userInput.elt.blur();
   }
