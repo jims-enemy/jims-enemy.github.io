@@ -19,9 +19,6 @@ function setup() {
   stroke("white");
   textAlign(LEFT, TOP);
   fill("white");
-
-  // eslint-disable-next-line no-undef
-  textWrap(CHAR); // This is defined and works. ESLint just misflags it.
 }
 
 function windowResized() {
@@ -33,13 +30,23 @@ function windowResized() {
 function draw() {
   background("black");
   text(userText, width/16, 0, width/8 * 7, height/7 * 6);
-  // Your p5.js drawing code here
 }
 
 function keyPressed() {
   if (keyCode === ENTER && userInput.elt === document.activeElement && ! keyIsDown(SHIFT)) {
+    let lineBrokenText = "";
+    let startSlice = 0;
+
     socket.send(userInput.value());
-    userText += userInput.value();
+
+    for (let character = 0; character < lineBrokenText.length; character++) {
+      if (textWidth(userInput.value().slice(startSlice, character)) > width/8 * 7) {
+        character--;
+        lineBrokenText += userInput.value().slice(startSlice, character) + "\n";
+        startSlice = character;
+      }
+    }
+    userText = lineBrokenText;
     userInput.value("");
     userInput.elt.blur();
   }
