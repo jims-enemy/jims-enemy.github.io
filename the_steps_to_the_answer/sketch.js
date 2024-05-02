@@ -11,6 +11,7 @@ function setup() {
   };
   socket.onmessage = (event) => {
     console.log("Received message from Python:", event.data);
+    userText += event.data;
   };
   userInput = createElement("textarea");
   userInput.position(width/16, height/7 * 6);
@@ -39,14 +40,24 @@ function keyPressed() {
 
     socket.send(userInput.value());
 
-    for (let character = 0; character < lineBrokenText.length; character++) {
+    for (let character = 0; character < userInput.value().length; character++) {
       if (textWidth(userInput.value().slice(startSlice, character)) > width/8 * 7) {
         character--;
-        lineBrokenText += userInput.value().slice(startSlice, character) + "\n";
-        startSlice = character;
+        if (userInput.value().slice(startSlice, character).includes(" ")) {
+          character = userInput.value().lastIndexOf(" ");
+          lineBrokenText += userInput.value().slice(startSlice, character) + "\n";
+          character++;
+          startSlice = character;
+        }
+        else {
+          lineBrokenText += userInput.value().slice(startSlice, character) + "\n";
+          startSlice = character;
+        }
       }
     }
-    userText = lineBrokenText;
+
+    lineBrokenText += userInput.value().slice(startSlice, userInput.value().length) + "\n";
+    userText += lineBrokenText;
     userInput.value("");
     userInput.elt.blur();
   }
